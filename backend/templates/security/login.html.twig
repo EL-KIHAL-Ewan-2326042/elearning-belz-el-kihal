@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center align-items-center min-vh-100">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-lg">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <h1 class="h3 mb-2">🎓 EduLearn</h1>
+                    <p class="text-muted">Espace Professeur</p>
+                </div>
+                
+                {% if error %}
+                    <div class="alert alert-danger">
+                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                    </div>
+                {% endif %}
+
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="inputEmail" class="form-label">Adresse email</label>
+                        <input type="email" value="{{ last_username }}" name="_username" id="inputEmail" class="form-control" placeholder="votre@email.com" required autofocus>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="inputPassword" class="form-label">Mot de passe</label>
+                        <input type="password" name="_password" id="inputPassword" class="form-control" placeholder="••••••••" required>
+                    </div>
+
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    <button class="btn btn-primary w-100 py-2 mb-3" type="submit">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Se connecter
+                    </button>
+                    
+                    <div class="text-center">
+                        <a href="{{ path('app_teacher_register') }}" class="text-decoration-none">
+                            Pas encore de compte ? S'inscrire
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

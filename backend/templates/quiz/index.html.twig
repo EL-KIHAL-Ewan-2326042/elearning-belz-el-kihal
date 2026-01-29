@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}QCM{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">
+        <i class="bi bi-question-circle me-2"></i> Tous les QCM
+    </h1>
+</div>
+
+{% if quizzes is empty %}
+    <div class="card text-center py-5">
+        <div class="card-body">
+            <i class="bi bi-question-octagon text-muted" style="font-size: 4rem;"></i>
+            <h4 class="mt-3">Aucun QCM</h4>
+            <p class="text-muted">Créez d'abord un cours puis générez un QCM par IA.</p>
+            <a href="{{ path('course_new') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i> Créer un cours
+            </a>
+        </div>
+    </div>
+{% else %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for quiz in quizzes %}
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title">{{ quiz.title }}</h5>
+                            {% if quiz.isGeneratedByAI %}
+                                <span class="badge badge-ai">🤖 IA</span>
+                            {% endif %}
+                        </div>
+                        <p class="card-text text-muted small mb-3">
+                            {% if quiz.description %}
+                                {{ quiz.description|length > 80 ? quiz.description|slice(0, 80) ~ '...' : quiz.description }}
+                            {% else %}
+                                QCM pour le cours "{{ quiz.course.title }}"
+                            {% endif %}
+                        </p>
+                        
+                        <div class="d-flex gap-2 mb-2">
+                            <span class="badge bg-primary">
+                                {{ quiz.questions|length }} questions
+                            </span>
+                            <span class="badge bg-info">
+                                {{ quiz.attempts|length }} tentatives
+                            </span>
+                        </div>
+                        
+                        <small class="text-muted">
+                            Créé le {{ quiz.createdAt|date('d/m/Y à H:i') }}
+                        </small>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <div class="d-flex gap-2">
+                            <a href="{{ path('quiz_show', {id: quiz.id}) }}" class="btn btn-outline-primary btn-sm flex-fill">
+                                <i class="bi bi-eye me-1"></i> Voir
+                            </a>
+                            <a href="{{ path('quiz_results', {id: quiz.id}) }}" class="btn btn-outline-success btn-sm flex-fill">
+                                <i class="bi bi-bar-chart me-1"></i> Résultats
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

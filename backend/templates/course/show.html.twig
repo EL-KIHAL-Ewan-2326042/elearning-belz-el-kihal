@@ -1,0 +1,202 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block body %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ path('course_index') }}">Cours</a></li>
+        <li class="breadcrumb-item active">{{ course.title }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Course Info -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h1 class="h3 mb-2">{{ course.title }}</h1>
+                        <p class="text-muted mb-3">{{ course.description }}</p>
+                        {% if course.summary %}
+                            <div class="bg-light p-3 rounded">
+                                <h6 class="text-primary mb-2">📝 Résumé</h6>
+                                <p class="mb-0 small">{{ course.summary }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                            Actions
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ path('course_edit', {id: course.id}) }}">
+                                <i class="bi bi-pencil me-2"></i> Modifier
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ path('course_delete', {id: course.id}) }}" method="post" onsubmit="return confirm('Supprimer ce cours ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ course.id) }}">
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="bi bi-trash me-2"></i> Supprimer
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Videos -->
+        <div class="card mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-play-circle me-2"></i> Vidéos</h5>
+            </div>
+            <div class="card-body">
+                {% if course.videos is empty %}
+                    <p class="text-muted text-center py-3 mb-0">Aucune vidéo pour ce cours.</p>
+                {% else %}
+                    <div class="list-group list-group-flush">
+                        {% for video in course.videos %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ video.title }}</h6>
+                                    {% if video.duration %}
+                                        <small class="text-muted">{{ (video.duration / 60)|number_format(0) }} min</small>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {% if video.url %}
+                                        <a href="{{ video.url }}" class="btn btn-sm btn-outline-secondary" target="_blank">Lien Externe</a>
+                                    {% endif %}
+                                    {% if video.fileName %}
+                                        <a href="{{ asset('uploads/videos/' ~ video.fileName) }}" class="btn btn-sm btn-outline-primary" target="_blank">Télécharger</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="card mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-file-earmark me-2"></i> Documents</h5>
+            </div>
+            <div class="card-body">
+                {% if course.documents is empty %}
+                    <p class="text-muted text-center py-3 mb-0">Aucun document pour ce cours.</p>
+                {% else %}
+                    <div class="list-group list-group-flush">
+                        {% for document in course.documents %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ document.title }}</h6>
+                                    {% if document.description %}
+                                        <small class="text-muted">{{ document.description }}</small>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {% if document.fileName %}
+                                        <a href="{{ asset('uploads/documents/' ~ document.fileName) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                            <i class="bi bi-download"></i> Télécharger
+                                        </a>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Fichier manquant</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Stats -->
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">📊 Statistiques</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Vidéos</span>
+                    <strong>{{ course.videos|length }}</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Documents</span>
+                    <strong>{{ course.documents|length }}</strong>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>QCM</span>
+                    <strong>{{ course.quizzes|length }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generate Quiz -->
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <span class="badge badge-ai me-2">🤖</span> Générer un QCM par IA
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted mb-3">
+                    Générez automatiquement un QCM à partir du contenu de ce cours grâce à l'intelligence artificielle.
+                </p>
+                <form action="{{ path('course_generate_quiz', {id: course.id}) }}" method="post">
+                    <input type="hidden" name="_token" value="{{ csrf_token('generate_quiz' ~ course.id) }}">
+                    <div class="mb-3">
+                        <label class="form-label small">Nombre de questions</label>
+                        <select name="question_count" class="form-select form-select-sm">
+                            <option value="5">5 questions</option>
+                            <option value="10" selected>10 questions</option>
+                            <option value="15">15 questions</option>
+                            <option value="20">20 questions</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-magic me-1"></i> Générer le QCM
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Quizzes List -->
+        <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-question-circle me-2"></i> QCM du cours</h5>
+            </div>
+            <div class="card-body">
+                {% if course.quizzes is empty %}
+                    <p class="text-muted text-center py-3 mb-0">Aucun QCM.</p>
+                {% else %}
+                    <div class="list-group list-group-flush">
+                        {% for quiz in course.quizzes %}
+                            <a href="{{ path('quiz_show', {id: quiz.id}) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ quiz.title }}</h6>
+                                        <small class="text-muted">{{ quiz.questions|length }} questions</small>
+                                        {% if quiz.isGeneratedByAI %}
+                                            <span class="badge badge-ai ms-1">IA</span>
+                                        {% endif %}
+                                    </div>
+                                    <i class="bi bi-chevron-right"></i>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

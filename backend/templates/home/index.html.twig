@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EduLearn - Plateforme d'Apprentissage{% endblock %}
+
+{% block body %}
+<div 
+    id="react-app"
+    data-user="{{ app.user ? {
+        id: app.user.id,
+        email: app.user.email,
+        firstName: app.user.firstName,
+        lastName: app.user.lastName,
+        roles: app.user.roles
+    }|json_encode : '' }}"
+></div>
+{% endblock %}

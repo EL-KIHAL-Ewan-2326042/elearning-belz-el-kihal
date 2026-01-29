@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Résultats - {{ quiz.title }}{% endblock %}
+
+{% block body %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ path('quiz_index') }}">QCM</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('quiz_show', {id: quiz.id}) }}">{{ quiz.title }}</a></li>
+        <li class="breadcrumb-item active">Résultats</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">
+        <i class="bi bi-bar-chart me-2"></i> Résultats - {{ quiz.title }}
+    </h1>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-primary mb-0">{{ totalAttempts }}</h3>
+                <p class="text-muted mb-0">Tentatives</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="{% if averageScore >= 70 %}text-success{% elseif averageScore >= 50 %}text-warning{% else %}text-danger{% endif %} mb-0">
+                    {{ averageScore }}%
+                </h3>
+                <p class="text-muted mb-0">Moyenne</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-info mb-0">{{ quiz.questions|length }}</h3>
+                <p class="text-muted mb-0">Questions</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Results Table -->
+{% if attempts is empty %}
+    <div class="card text-center py-5">
+        <div class="card-body">
+            <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+            <h4 class="mt-3">Pas encore de résultats</h4>
+            <p class="text-muted">Aucun étudiant n'a encore passé ce QCM.</p>
+        </div>
+    </div>
+{% else %}
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Étudiant</th>
+                        <th class="text-center">Score</th>
+                        <th class="text-center">Pourcentage</th>
+                        <th class="text-center">Temps</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for attempt in attempts %}
+                        {% set percentage = (attempt.score / attempt.maxScore * 100)|round(1) %}
+                        <tr>
+                            <td>
+                                <strong>{{ attempt.student.firstName }} {{ attempt.student.lastName }}</strong><br>
+                                <small class="text-muted">{{ attempt.student.email }}</small>
+                            </td>
+                            <td class="text-center">
+                                {{ attempt.score }}/{{ attempt.maxScore }}
+                            </td>
+                            <td class="text-center">
+                                <span class="badge {% if percentage >= 70 %}bg-success{% elseif percentage >= 50 %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ percentage }}%
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                {% set minutes = (attempt.timeSpentSeconds / 60)|round(0, 'floor') %}
+                                {% set seconds = attempt.timeSpentSeconds % 60 %}
+                                {{ minutes }}:{{ seconds|format_number({pattern: '00'}) }}
+                            </td>
+                            <td>
+                                {{ attempt.submittedAt|date('d/m/Y H:i') }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

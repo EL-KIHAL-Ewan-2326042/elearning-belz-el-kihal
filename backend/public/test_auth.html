@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Test Auth - eLearning</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            background: #f4f4f4;
+        }
+
+        .container {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            min-width: 300px;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        input {
+            display: block;
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #message {
+            margin-top: 2rem;
+            padding: 1rem;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        pre {
+            background: #333;
+            color: #fff;
+            padding: 1rem;
+            overflow-x: auto;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Test Authentification</h1>
+
+    <div class="container">
+        <!-- Register -->
+        <div class="card">
+            <h2>Inscription</h2>
+            <form id="registerForm">
+                <input type="email" id="regEmail" placeholder="Email" required value="test@test.com">
+                <input type="password" id="regPassword" placeholder="Mot de passe" required value="password123">
+                <input type="text" id="regFirst" placeholder="Prénom" required value="Jean">
+                <input type="text" id="regLast" placeholder="Nom" required value="Dupont">
+                <button type="submit">S'inscrire</button>
+            </form>
+        </div>
+
+        <!-- Login -->
+        <div class="card">
+            <h2>Connexion</h2>
+            <form id="loginForm">
+                <input type="email" id="loginEmail" placeholder="Email" required value="test@test.com">
+                <input type="password" id="loginPassword" placeholder="Mot de passe" required value="password123">
+                <button type="submit">Se connecter</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="message"></div>
+    <div id="tokenDisplay" style="display:none; margin-top: 2rem;">
+        <h3>Token JWT Reçu :</h3>
+        <pre id="tokenValue"></pre>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:8000/api';
+        const msgDiv = document.getElementById('message');
+        const tokenDiv = document.getElementById('tokenDisplay');
+        const tokenVal = document.getElementById('tokenValue');
+
+        function showMsg(text, type) {
+            msgDiv.textContent = text;
+            msgDiv.className = type;
+            msgDiv.style.display = 'block';
+        }
+
+        // INSCRIPTION
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            msgDiv.style.display = 'none';
+
+            const data = {
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value,
+                firstName: document.getElementById('regFirst').value,
+                lastName: document.getElementById('regLast').value,
+                roles: []
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/ld+json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    showMsg('Inscription réussie ! Vous pouvez vous connecter.', 'success');
+                } else {
+                    const err = await res.json();
+                    showMsg('Erreur: ' + (err['hydra:description'] || res.statusText), 'error');
+                }
+            } catch (error) {
+                showMsg('Erreur réseau : ' + error.message, 'error');
+            }
+        });
+
+        // CONNEXION
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            msgDiv.style.display = 'none';
+            tokenDiv.style.display = 'none';
+
+            const data = {
+                username: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/login_check`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    const json = await res.json();
+                    showMsg('Connexion réussie ! Token reçu.', 'success');
+                    tokenVal.textContent = json.token;
+                    tokenDiv.style.display = 'block';
+                } else {
+                    showMsg('Échec connexion (Vérifiez login/mdp)', 'error');
+                }
+            } catch (error) {
+                showMsg('Erreur réseau : ' + error.message, 'error');
+            }
+        });
+    </script>
+
+</body>
+
+</html>
