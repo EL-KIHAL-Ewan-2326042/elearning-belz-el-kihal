@@ -1,0 +1,137 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails Tentative - {{ attempt.student.firstName }}{% endblock %}
+
+{% block body %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ path('quiz_index') }}">QCM</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('quiz_show', {id: quiz.id}) }}">{{ quiz.title }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('quiz_results', {id: quiz.id}) }}">Résultats</a></li>
+        <li class="breadcrumb-item active">Détails</li>
+    </ol>
+    </ol>
+</nav>
+
+{% if quiz.updatedAt and quiz.updatedAt > attempt.submittedAt %}
+    <div class="alert alert-warning mb-4">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        Attention : Ce QCM a été modifié le {{ quiz.updatedAt|date('d/m/Y à H:i') }}, après la tentative de l'étudiant.
+    </div>
+{% endif %}
+
+<div class="card mb-4 border-0 shadow-sm text-dark">
+    <div class="card-body p-4 text-center">
+        <h2 class="h4 mb-2">{{ quiz.title }}</h2>
+        <p class="mb-4 opacity-75">
+            Étudiant : {{ attempt.student.firstName }} {{ attempt.student.lastName }} ({{ attempt.student.email }})
+        </p>
+
+        <div class="d-inline-flex gap-4">
+            <div class="bg-secondary-subtle px-4 py-2 rounded">
+                <small class="d-block opacity-75">Score</small>
+                <span class="fs-4 fw-bold">{{ attempt.score }} / {{ attempt.maxScore }}</span>
+            </div>
+            <div class="bg-secondary-subtle px-4 py-2 rounded">
+                <small class="d-block opacity-75">Pourcentage</small>
+                <span class="fs-4 fw-bold">{{ (attempt.score / attempt.maxScore * 100)|round(0) }}%</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% set studentAnswers = attempt.answers %}
+    
+    {% for question in quiz.questions %}
+        {% set studentAnswerContents = [] %}
+        {% set correctAnswerContents = [] %}
+        {% set studentAnsIds = studentAnswers[question.id] ?? [] %}
+        
+        {# Handle single value legacy data #}
+        {% if studentAnsIds is not iterable %}
+            {% set studentAnsIds = [studentAnsIds] %}
+        {% endif %}
+
+        {% set isCorrect = false %}
+        
+        {# Find answers content and check correctness #}
+        {% set correctIds = [] %}
+        {% for ans in question.answers %}
+            {% if ans.isCorrect %}
+                {% set correctAnswerContents = correctAnswerContents|merge([ans.content]) %}
+                {% set correctIds = correctIds|merge([ans.id]) %}
+            {% endif %}
+            
+            {% if ans.id in studentAnsIds %}
+                {% set studentAnswerContents = studentAnswerContents|merge([ans.content]) %}
+            {% endif %}
+        {% endfor %}
+
+        {# Determine global correctness #}
+        {% if question.isMultiple %}
+             {% set isCorrect = (studentAnsIds|length == correctIds|length) %}
+             {% for id in studentAnsIds %}
+                 {% if id not in correctIds %}
+                     {% set isCorrect = false %}
+                 {% endif %}
+             {% endfor %}
+        {% else %}
+             {# Fallback for single #}
+             {% set isCorrect = false %}
+             {% for id in studentAnsIds %}
+                 {% if id in correctIds %}
+                     {% set isCorrect = true %}
+                 {% endif %}
+             {% endfor %}
+        {% endif %}
+
+
+        <div class="col-12">
+            <div class="card h-100 border-start border-5 {{ isCorrect ? 'border-success' : 'border-danger' }}">
+                <div class="card-body">
+                    <h5 class="card-title d-flex align-items-start gap-3">
+                        <span class="badge {{ isCorrect ? 'bg-success' : 'bg-danger' }} rounded-circle p-2" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                            {{ loop.index }}
+                        </span>
+                        <span>{{ question.content }}</span>
+                    </h5>
+
+                    <div class="mt-3">
+                        <div class="p-2 rounded mb-2 {{ isCorrect ? 'bg-success-subtle text-success-emphasis' : 'bg-danger-subtle text-danger-emphasis' }}">
+                            <small class="text-uppercase fw-bold opacity-75" style="font-size: 0.7rem;">Réponse de l'étudiant</small><br>
+                            {% if studentAnswerContents is empty %}
+                                <em class="text-muted">Pas de réponse</em>
+                            {% elseif studentAnswerContents|length > 1 %}
+                                <ul class="mb-0 ps-3">
+                                    {% for content in studentAnswerContents %}
+                                        <li>{{ content }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                {{ studentAnswerContents[0] }}
+                            {% endif %}
+                            <i class="bi {{ isCorrect ? 'bi-check-circle-fill' : 'bi-x-circle-fill' }} float-end fs-5"></i>
+                        </div>
+
+                        {% if not isCorrect %}
+                        <div class="p-2 rounded bg-info-subtle text-info-emphasis">
+                            <small class="text-uppercase fw-bold opacity-75" style="font-size: 0.7rem;">Bonne réponse</small><br>
+                            {% if correctAnswerContents|length > 1 %}
+                                <ul class="mb-0 ps-3">
+                                    {% for content in correctAnswerContents %}
+                                        <li>{{ content }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                {{ correctAnswerContents[0] }}
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

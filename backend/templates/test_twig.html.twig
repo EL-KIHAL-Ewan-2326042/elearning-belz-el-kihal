@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Twig Test{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="alert alert-success">
+            <h1>✅ Twig is working!</h1>
+            <p>If you see this, the template engine is functioning correctly.</p>
+            <p>Current user: {{ app.user ? app.user.email : 'Anonymous' }}</p>
+        </div>
+    </div>
+{% endblock %}

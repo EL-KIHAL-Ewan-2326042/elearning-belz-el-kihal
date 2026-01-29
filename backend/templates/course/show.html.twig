@@ -1,0 +1,425 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block body %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ path('course_index') }}">Cours</a></li>
+        <li class="breadcrumb-item active">{{ course.title }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Course Info -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h1 class="h3 mb-2">{{ course.title }}</h1>
+                        <p class="text-muted mb-3">{{ course.description }}</p>
+                        {% if course.summary %}
+                            <div class="bg-light p-3 rounded">
+                                <h6 class="text-primary mb-2">📝 Résumé</h6>
+                                <p class="mb-0 small">{{ course.summary }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                            Actions
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ path('course_edit', {id: course.id}) }}">
+                                <i class="bi bi-pencil me-2"></i> Modifier
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ path('course_delete', {id: course.id}) }}" method="post" onsubmit="return confirm('Supprimer ce cours ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ course.id) }}">
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="bi bi-trash me-2"></i> Supprimer
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Videos -->
+        <div class="card mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-play-circle me-2"></i> Vidéos</h5>
+            </div>
+            <div class="card-body">
+                {% if course.videos is empty %}
+                    <p class="text-muted text-center py-3 mb-0">Aucune vidéo pour ce cours.</p>
+                {% else %}
+                    <div class="d-flex flex-column gap-4">
+                        {% for video in course.videos %}
+                            <div class="card border-0 shadow-sm overflow-hidden">
+                                <div class="card-body p-0">
+                                    <div class="row g-0">
+                                        <div class="{{ video.transcription ? 'col-lg-8' : 'col-12' }}">
+                                            <!-- Lazy Video Container -->
+                                            <div class="video-lazy-container position-relative" 
+                                                 data-video-src="{{ video.fileName ? asset('uploads/videos/' ~ video.fileName) : video.url }}"
+                                                 data-video-id="video-{{ video.id }}"
+                                                 style="aspect-ratio: 16/9; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); cursor: pointer;">
+                                                
+                                                <!-- Play Button Overlay -->
+                                                <div class="video-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                                    <div class="play-button bg-danger rounded-circle d-flex align-items-center justify-content-center shadow-lg" 
+                                                         style="width: 70px; height: 70px; transition: transform 0.2s;">
+                                                        <i class="bi bi-play-fill text-white" style="font-size: 2rem; margin-left: 4px;"></i>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Video Title on Thumbnail -->
+                                                <div class="position-absolute bottom-0 start-0 w-100 p-2" style="background: linear-gradient(transparent, rgba(0,0,0,0.8));">
+                                                    <span class="text-white small fw-bold">{{ video.title }}</span>
+                                                    {% if video.duration %}
+                                                        <span class="badge bg-dark ms-2">{{ (video.duration / 60)|number_format(0) }} min</span>
+                                                    {% endif %}
+                                                </div>
+                                                
+                                                <!-- Hidden Video (loaded on click) -->
+                                                <video id="video-{{ video.id }}" 
+                                                       class="w-100 h-100 position-absolute top-0 start-0" 
+                                                       style="display: none; object-fit: cover;"
+                                                       controls 
+                                                       preload="none">
+                                                    <source src="{{ video.fileName ? asset('uploads/videos/' ~ video.fileName) : video.url }}" type="video/mp4">
+                                                </video>
+                                            </div>
+                                            
+                                            <div class="p-3 border-top">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h6 class="card-title mb-1">{{ video.title }}</h6>
+                                                        {% if video.description %}
+                                                            <p class="card-text text-muted small mb-2">{{ video.description }}</p>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="d-flex gap-2">
+                                                        {% if video.url %}
+                                                            <a href="{{ video.url }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                                                                <i class="bi bi-box-arrow-up-right me-1"></i> Externe
+                                                            </a>
+                                                        {% endif %}
+                                                        {% if video.fileName %}
+                                                            <a href="{{ asset('uploads/videos/' ~ video.fileName) }}" class="btn btn-sm btn-outline-primary" download>
+                                                                <i class="bi bi-download me-1"></i> Télécharger
+                                                            </a>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        {% if video.transcription %}
+                                            <div class="col-lg-4 border-start bg-light">
+                                                <div class="p-3 h-100 d-flex flex-column" style="max-height: 500px;">
+                                                    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                                                        <h6 class="text-muted text-uppercase small fw-bold mb-0">
+                                                            <i class="bi bi-fonts me-2"></i> Transcription
+                                                        </h6>
+                                                        <div class="d-flex align-items-center">
+                                                            {% if video.transcriptionUpdatedAt %}
+                                                                <span class="badge bg-success-subtle text-success border border-success-subtle me-2" style="font-size: 0.65rem;" title="Modifiée le {{ video.transcriptionUpdatedAt|date('d/m/Y H:i') }}">
+                                                                    <i class="bi bi-check-circle me-1"></i> Vérifiée
+                                                                </span>
+                                                            {% else %}
+                                                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle me-2" style="font-size: 0.65rem;" title="Transcription générée par IA non vérifiée">
+                                                                    <i class="bi bi-robot me-1"></i> IA
+                                                                </span>
+                                                            {% endif %}
+                                                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1" data-bs-toggle="modal" data-bs-target="#editTranscriptionModal{{ video.id }}">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-muted small overflow-auto flex-grow-1 custom-scrollbar" style="white-space: pre-wrap; font-family: system-ui;">{{ video.transcription }}</div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Modal Edit Transcription -->
+                                            <div class="modal fade" id="editTranscriptionModal{{ video.id }}" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-lg">
+                                                    <div class="modal-content">
+                                                        <form action="{{ path('video_update_transcription', {id: video.id}) }}" method="post">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Modifier la transcription - {{ video.title }}</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="mb-3">
+                                                                    <label class="form-label text-muted small">Contenu de la transcription</label>
+                                                                    <textarea name="transcription" class="form-control" rows="15" style="font-family: monospace; font-size: 0.9rem;">{{ video.transcription }}</textarea>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                                <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="card mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-file-earmark me-2"></i> Documents</h5>
+            </div>
+            <div class="card-body">
+                {% if course.documents is empty %}
+                    <p class="text-muted text-center py-3 mb-0">Aucun document pour ce cours.</p>
+                {% else %}
+                    <div class="list-group list-group-flush">
+                        {% for document in course.documents %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">
+                                        <i class="bi bi-file-earmark-pdf text-danger me-1"></i>
+                                        {{ document.title }}
+                                    </h6>
+                                    {% if document.description %}
+                                        <small class="text-muted">{{ document.description }}</small>
+                                    {% endif %}
+                                </div>
+                                <div class="d-flex gap-2">
+                                    {% if document.fileName %}
+                                        {% if document.fileName ends with '.pdf' %}
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-primary pdf-preview-btn"
+                                                    data-pdf-url="{{ asset('uploads/documents/' ~ document.fileName) }}"
+                                                    data-pdf-title="{{ document.title }}">
+                                                <i class="bi bi-eye me-1"></i> Prévisualiser
+                                            </button>
+                                        {% endif %}
+                                        <a href="{{ asset('uploads/documents/' ~ document.fileName) }}" 
+                                           class="btn btn-sm btn-outline-secondary" 
+                                           download>
+                                            <i class="bi bi-download"></i> Télécharger
+                                        </a>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Fichier manquant</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Stats -->
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">📊 Statistiques</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Vidéos</span>
+                    <strong>{{ course.videos|length }}</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Documents</span>
+                    <strong>{{ course.documents|length }}</strong>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>QCM</span>
+                    <strong>{{ course.quizzes|length }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generate Quiz -->
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <span class="badge badge-ai me-2">🤖</span> Générer un QCM par IA
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted mb-3">
+                    Générez automatiquement un QCM à partir du contenu de ce cours grâce à l'intelligence artificielle.
+                </p>
+                <form action="{{ path('course_generate_quiz', {id: course.id}) }}" method="post">
+                    <input type="hidden" name="_token" value="{{ csrf_token('generate_quiz' ~ course.id) }}">
+                    <div class="row g-2 mb-3">
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Nombre de questions par type</label>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label small text-muted" style="font-size: 0.75rem;">Vrai/Faux</label>
+                            <input type="number" name="true_false_count" class="form-control form-control-sm quiz-count-input" value="2" min="0" max="20">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label small text-muted" style="font-size: 0.75rem;">QCM (Unique)</label>
+                            <input type="number" name="mcq_single_count" class="form-control form-control-sm quiz-count-input" value="3" min="0" max="20">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label small text-muted" style="font-size: 0.75rem;">QCM (Multiple)</label>
+                            <input type="number" name="mcq_multiple_count" class="form-control form-control-sm quiz-count-input" value="0" min="0" max="20">
+                        </div>
+                    </div>
+                    <div class="alert alert-light py-2 px-3 mb-3 border d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Total des questions</small>
+                        <strong id="total-questions-count">5</strong>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-magic me-1"></i> Générer le QCM
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Quizzes List -->
+        <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-question-circle me-2"></i> QCM du cours</h5>
+            </div>
+            <div class="card-body">
+                {% if course.quizzes is empty %}
+                    <p class="text-muted text-center py-3 mb-0">Aucun QCM.</p>
+                {% else %}
+                    <div class="list-group list-group-flush">
+                        {% for quiz in course.quizzes %}
+                            <a href="{{ path('quiz_show', {id: quiz.id}) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ quiz.title }}</h6>
+                                        <small class="text-muted">{{ quiz.questions|length }} questions</small>
+                                        {% if quiz.isGeneratedByAI %}
+                                            <span class="badge badge-ai ms-1">IA</span>
+                                        {% endif %}
+                                    </div>
+                                    <i class="bi bi-chevron-right"></i>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PDF Preview Modal -->
+<div class="modal fade" id="pdfPreviewModal" tabindex="-1" aria-labelledby="pdfPreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pdfPreviewModalLabel">
+                    <i class="bi bi-file-earmark-pdf text-danger me-2"></i>
+                    <span id="pdfTitle">Document</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="pdfIframe" src="" style="width: 100%; height: 75vh; border: none;"></iframe>
+            </div>
+            <div class="modal-footer">
+                <a id="pdfDownloadLink" href="" class="btn btn-primary" download>
+                    <i class="bi bi-download me-1"></i> Télécharger
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // === LAZY VIDEO LOADING ===
+    document.querySelectorAll('.video-lazy-container').forEach(function(container) {
+        const overlay = container.querySelector('.video-overlay');
+        const video = container.querySelector('video');
+        const playButton = container.querySelector('.play-button');
+        
+        // Hover effect on play button
+        container.addEventListener('mouseenter', function() {
+            if (playButton) playButton.style.transform = 'scale(1.1)';
+        });
+        container.addEventListener('mouseleave', function() {
+            if (playButton) playButton.style.transform = 'scale(1)';
+        });
+        
+        // Click to load and play video
+        container.addEventListener('click', function() {
+            if (video && overlay) {
+                // Hide overlay
+                overlay.style.display = 'none';
+                // Show and play video
+                video.style.display = 'block';
+                video.load(); // Force load
+                video.play().catch(function(e) {
+                    console.log('Autoplay prevented:', e);
+                });
+            }
+        });
+    });
+    
+    // === PDF PREVIEW ===
+    const pdfModal = document.getElementById('pdfPreviewModal');
+    const pdfIframe = document.getElementById('pdfIframe');
+    const pdfTitle = document.getElementById('pdfTitle');
+    const pdfDownloadLink = document.getElementById('pdfDownloadLink');
+    
+    document.querySelectorAll('.pdf-preview-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const pdfUrl = this.getAttribute('data-pdf-url');
+            const title = this.getAttribute('data-pdf-title');
+            
+            pdfIframe.src = pdfUrl;
+            pdfTitle.textContent = title;
+            pdfDownloadLink.href = pdfUrl;
+            
+            const modal = new bootstrap.Modal(pdfModal);
+            modal.show();
+        });
+    });
+    
+    // Clear iframe when modal closes
+    pdfModal.addEventListener('hidden.bs.modal', function() {
+        pdfIframe.src = '';
+    });
+
+    // === QUIZ COUNT CALCULATION ===
+    const countInputs = document.querySelectorAll('.quiz-count-input');
+    const totalDisplay = document.getElementById('total-questions-count');
+
+    function updateTotal() {
+        let total = 0;
+        countInputs.forEach(input => {
+            total += parseInt(input.value) || 0;
+        });
+        totalDisplay.textContent = total;
+    }
+
+    countInputs.forEach(input => {
+        input.addEventListener('input', updateTotal);
+    });
+});
+</script>
+{% endblock %}

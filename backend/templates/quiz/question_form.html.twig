@@ -1,0 +1,137 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ is_new ? 'Nouvelle question' : 'Modifier la question' }} - {{ quiz.title }}{% endblock %}
+
+{% block body %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ path('quiz_index') }}">QCM</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('quiz_show', {id: quiz.id}) }}">{{ quiz.title }}</a></li>
+        <li class="breadcrumb-item active">{{ is_new ? 'Nouvelle question' : 'Modifier Q' ~ question.orderNumber }}</li>
+    </ol>
+</nav>
+
+<div class="card">
+    <div class="card-header bg-white">
+        <h4 class="mb-0">
+            <i class="bi bi-{{ is_new ? 'plus-circle' : 'pencil' }} me-2"></i>
+            {{ is_new ? 'Ajouter une question' : 'Modifier la question ' ~ question.orderNumber }}
+        </h4>
+    </div>
+    <div class="card-body">
+        {{ form_start(form, {'attr': {'id': 'question-form'}}) }}
+            <div class="mb-4">
+                {{ form_label(form.content) }}
+                {{ form_widget(form.content) }}
+                {{ form_errors(form.content) }}
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    {{ form_label(form.points) }}
+                    {{ form_widget(form.points) }}
+                    {{ form_errors(form.points) }}
+                </div>
+            </div>
+            
+            <h5 class="mb-3"><i class="bi bi-list-check me-2"></i>Réponses</h5>
+            
+            <div class="answers-container" data-prototype="{{ form_widget(form.answers.vars.prototype)|e('html_attr') }}">
+                {% for answer in form.answers %}
+                    <div class="answer-item card mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    {{ form_widget(answer.content) }}
+                                    {{ form_errors(answer.content) }}
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        {{ form_widget(answer.isCorrect) }}
+                                        {{ form_label(answer.isCorrect) }}
+                                    </div>
+                                </div>
+                                <div class="col-md-1 text-end">
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-answer" title="Supprimer cette réponse">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <button type="button" class="btn btn-outline-primary mb-4" id="add-answer">
+                <i class="bi bi-plus-lg me-1"></i>Ajouter une réponse
+            </button>
+            
+            <hr>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg me-1"></i>{{ is_new ? 'Créer la question' : 'Enregistrer' }}
+                </button>
+                <a href="{{ path('quiz_show', {id: quiz.id}) }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-lg me-1"></i>Annuler
+                </a>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const answersContainer = document.querySelector('.answers-container');
+    const addButton = document.getElementById('add-answer');
+    let answerIndex = answersContainer.querySelectorAll('.answer-item').length;
+    
+    // Ajouter une nouvelle réponse
+    addButton.addEventListener('click', function() {
+        const prototype = answersContainer.dataset.prototype;
+        const newForm = prototype.replace(/__name__/g, answerIndex);
+        
+        const wrapper = document.createElement('div');
+        wrapper.className = 'answer-item card mb-3';
+        wrapper.innerHTML = `
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        ${newForm.match(/<input[^>]*name="[^"]*\[content\]"[^>]*>/)[0].replace('class="', 'class="form-control ')}
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-check">
+                            ${newForm.match(/<input[^>]*name="[^"]*\[isCorrect\]"[^>]*>/)[0].replace('class="', 'class="form-check-input ')}
+                            <label class="form-check-label">Réponse correcte</label>
+                        </div>
+                    </div>
+                    <div class="col-md-1 text-end">
+                        <button type="button" class="btn btn-outline-danger btn-sm remove-answer" title="Supprimer cette réponse">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        answersContainer.appendChild(wrapper);
+        answerIndex++;
+        
+        // Attacher l'événement de suppression
+        wrapper.querySelector('.remove-answer').addEventListener('click', function() {
+            wrapper.remove();
+        });
+    });
+    
+    // Supprimer une réponse existante
+    document.querySelectorAll('.remove-answer').forEach(function(button) {
+        button.addEventListener('click', function() {
+            this.closest('.answer-item').remove();
+        });
+    });
+});
+</script>
+{% endblock %}

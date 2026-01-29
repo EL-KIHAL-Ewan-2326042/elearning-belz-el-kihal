@@ -1,0 +1,128 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ quiz.title }}{% endblock %}
+
+{% block body %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ path('quiz_index') }}">QCM</a></li>
+        <li class="breadcrumb-item active">{{ quiz.title }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">{{ quiz.title }}</h4>
+                <div class="d-flex align-items-center gap-2">
+                    {% if quiz.isGeneratedByAI %}
+                        <span class="badge badge-ai">🤖 Généré par IA</span>
+                    {% endif %}
+                    <a href="{{ path('quiz_edit', {id: quiz.id}) }}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-pencil me-1"></i>Modifier
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if quiz.description %}
+                    <p class="text-muted mb-4">{{ quiz.description }}</p>
+                {% endif %}
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Questions ({{ quiz.questions|length }})</h5>
+                    <a href="{{ path('quiz_question_new', {id: quiz.id}) }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-lg me-1"></i>Ajouter une question
+                    </a>
+                </div>
+                
+                {% if quiz.questions|length == 0 %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Ce QCM ne contient pas encore de questions. 
+                        <a href="{{ path('quiz_question_new', {id: quiz.id}) }}">Ajouter une question</a>
+                    </div>
+                {% else %}
+                    <div class="accordion" id="questionsAccordion">
+                        {% for question in quiz.questions %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#question{{ question.id }}">
+                                        <strong class="me-2">Q{{ question.orderNumber }}.</strong> 
+                                        {{ question.content|length > 80 ? question.content|slice(0, 80) ~ '...' : question.content }}
+                                        <span class="badge bg-secondary ms-2">{{ question.points }} pt{{ question.points > 1 ? 's' : '' }}</span>
+                                    </button>
+                                </h2>
+                                <div id="question{{ question.id }}" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                        <p class="mb-3"><strong>Question complète :</strong> {{ question.content }}</p>
+                                        
+                                        <ul class="list-group mb-3">
+                                            {% for answer in question.answers %}
+                                                <li class="list-group-item d-flex align-items-center {% if answer.isCorrect %}list-group-item-success{% endif %}">
+                                                    {% if answer.isCorrect %}
+                                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                                    {% else %}
+                                                        <i class="bi bi-circle text-muted me-2"></i>
+                                                    {% endif %}
+                                                    {{ answer.content }}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                        
+                                        <div class="d-flex gap-2">
+                                            <a href="{{ path('quiz_question_edit', {id: question.id}) }}" class="btn btn-outline-primary btn-sm">
+                                                <i class="bi bi-pencil me-1"></i>Modifier
+                                            </a>
+                                            <form action="{{ path('quiz_question_delete', {id: question.id}) }}" method="post" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette question ?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete_question' ~ question.id) }}">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                    <i class="bi bi-trash me-1"></i>Supprimer
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">📊 Informations</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Cours</span>
+                    <a href="{{ path('course_show', {id: quiz.course.id}) }}">{{ quiz.course.title }}</a>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Questions</span>
+                    <strong>{{ quiz.questions|length }}</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Tentatives</span>
+                    <strong>{{ quiz.attempts|length }}</strong>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Créé le</span>
+                    <strong>{{ quiz.createdAt|date('d/m/Y') }}</strong>
+                </div>
+            </div>
+        </div>
+        
+        <a href="{{ path('quiz_results', {id: quiz.id}) }}" class="btn btn-success w-100 mb-3">
+            <i class="bi bi-bar-chart me-1"></i> Voir les résultats
+        </a>
+        
+        <a href="{{ path('quiz_edit', {id: quiz.id}) }}" class="btn btn-outline-primary w-100 mb-3">
+            <i class="bi bi-pencil me-1"></i> Modifier le QCM
+        </a>
+    </div>
+</div>
+{% endblock %}
