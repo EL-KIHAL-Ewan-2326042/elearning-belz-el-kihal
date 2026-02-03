@@ -10,43 +10,54 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\QuizAttemptRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: QuizAttemptRepository::class)]
 #[ApiResource(
     operations: [
         new GetCollection(),
+        new \ApiPlatform\Metadata\Get(),
         new Post(processor: \App\State\QuizAttemptProcessor::class),
-    ]
+    ],
+    normalizationContext: ['groups' => ['quiz_attempt:read']]
 )]
-#[ApiFilter(SearchFilter::class, properties: ['student' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['student' => 'exact', 'quiz' => 'exact'])]
 class QuizAttempt
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['quiz_attempt:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'quizAttempts')]
     #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['quiz_attempt:read'])]
     private ?Student $student = null;
 
     #[ORM\ManyToOne(inversedBy: 'attempts')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['quiz_attempt:read'])]
     private ?Quiz $quiz = null;
 
     #[ORM\Column]
+    #[Groups(['quiz_attempt:read'])]
     private ?int $score = null;
 
     #[ORM\Column]
+    #[Groups(['quiz_attempt:read'])]
     private ?int $maxScore = null;
 
     #[ORM\Column(type: Types::JSON)]
+    #[Groups(['quiz_attempt:read'])]
     private array $answers = [];
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['quiz_attempt:read'])]
     private ?\DateTimeInterface $submittedAt = null;
 
     #[ORM\Column]
+    #[Groups(['quiz_attempt:read'])]
     private ?int $timeSpentSeconds = null;
 
     public function __construct()

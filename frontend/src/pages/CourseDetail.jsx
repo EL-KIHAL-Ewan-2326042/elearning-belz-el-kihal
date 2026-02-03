@@ -90,8 +90,8 @@ export default function CourseDetail() {
                     <button
                         onClick={() => setActiveTab('videos')}
                         className={`px-6 py-3 rounded-lg font-semibold transition ${activeTab === 'videos'
-                                ? 'hero-gradient text-white'
-                                : 'bg-white text-gray-600 hover:bg-gray-50'
+                            ? 'hero-gradient text-white'
+                            : 'bg-white text-gray-600 hover:bg-gray-50'
                             }`}
                     >
                         📹 Vidéos
@@ -99,8 +99,8 @@ export default function CourseDetail() {
                     <button
                         onClick={() => setActiveTab('documents')}
                         className={`px-6 py-3 rounded-lg font-semibold transition ${activeTab === 'documents'
-                                ? 'hero-gradient text-white'
-                                : 'bg-white text-gray-600 hover:bg-gray-50'
+                            ? 'hero-gradient text-white'
+                            : 'bg-white text-gray-600 hover:bg-gray-50'
                             }`}
                     >
                         📄 Documents
@@ -108,8 +108,8 @@ export default function CourseDetail() {
                     <button
                         onClick={() => setActiveTab('quizzes')}
                         className={`px-6 py-3 rounded-lg font-semibold transition ${activeTab === 'quizzes'
-                                ? 'hero-gradient text-white'
-                                : 'bg-white text-gray-600 hover:bg-gray-50'
+                            ? 'hero-gradient text-white'
+                            : 'bg-white text-gray-600 hover:bg-gray-50'
                             }`}
                     >
                         📝 QCM
@@ -161,6 +161,14 @@ export default function CourseDetail() {
 
                         {activeTab === 'quizzes' && quizzes.length > 0 && (
                             <div className="space-y-4">
+                                <div className="flex justify-end mb-4">
+                                    <Link
+                                        to={`/results?course=${course.id}`}
+                                        className="btn bg-blue-100 text-primary hover:bg-blue-200 transition no-underline px-4 py-2 rounded-lg font-medium"
+                                    >
+                                        📊 Voir mes résultats pour ce cours
+                                    </Link>
+                                </div>
                                 {quizzes.map(quiz => (
                                     <div key={quiz.id} className="bg-white rounded-xl shadow-lg p-6">
                                         <div className="flex items-start justify-between">
@@ -208,8 +216,8 @@ export default function CourseDetail() {
                                             key={video.id}
                                             onClick={() => setSelectedVideo(video)}
                                             className={`w-full text-left p-3 rounded-lg transition ${selectedVideo?.id === video.id
-                                                    ? 'bg-blue-100 border-l-4 border-primary'
-                                                    : 'hover:bg-gray-100'
+                                                ? 'bg-blue-100 border-l-4 border-primary'
+                                                : 'hover:bg-gray-100'
                                                 }`}
                                         >
                                             <p className="font-medium text-sm">{video.title}</p>
@@ -232,8 +240,8 @@ export default function CourseDetail() {
                                             key={doc.id}
                                             onClick={() => setSelectedDocument(doc)}
                                             className={`w-full text-left p-3 rounded-lg transition ${selectedDocument?.id === doc.id
-                                                    ? 'bg-blue-100 border-l-4 border-primary'
-                                                    : 'hover:bg-gray-100'
+                                                ? 'bg-blue-100 border-l-4 border-primary'
+                                                : 'hover:bg-gray-100'
                                                 }`}
                                         >
                                             <p className="font-medium text-sm">{doc.title}</p>

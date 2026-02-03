@@ -67,6 +67,7 @@
                         <th class="text-center">Pourcentage</th>
                         <th class="text-center">Temps</th>
                         <th>Date</th>
+                        <th class="text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -74,7 +75,9 @@
                         {% set percentage = (attempt.score / attempt.maxScore * 100)|round(1) %}
                         <tr>
                             <td>
-                                <strong>{{ attempt.student.firstName }} {{ attempt.student.lastName }}</strong><br>
+                                <a href="{{ path('teacher_student_history', {id: attempt.student.id}) }}" class="text-decoration-none fw-bold text-dark">
+                                    {{ attempt.student.firstName }} {{ attempt.student.lastName }}
+                                </a><br>
                                 <small class="text-muted">{{ attempt.student.email }}</small>
                             </td>
                             <td class="text-center">
@@ -88,10 +91,15 @@
                             <td class="text-center">
                                 {% set minutes = (attempt.timeSpentSeconds / 60)|round(0, 'floor') %}
                                 {% set seconds = attempt.timeSpentSeconds % 60 %}
-                                {{ minutes }}:{{ seconds|format_number({pattern: '00'}) }}
+                                {{ minutes }}:{{ "%02d"|format(seconds) }}
                             </td>
                             <td>
                                 {{ attempt.submittedAt|date('d/m/Y H:i') }}
+                            </td>
+                            <td class="text-end">
+                                <a href="{{ path('quiz_attempt_detail', {id: attempt.id}) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> Détails
+                                </a>
                             </td>
                         </tr>
                     {% endfor %}

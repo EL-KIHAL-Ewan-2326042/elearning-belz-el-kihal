@@ -8,6 +8,7 @@ import Courses from './pages/Courses';
 import CourseDetail from './pages/CourseDetail';
 import Quiz from './pages/Quiz';
 import MyResults from './pages/MyResults';
+import QuizAttemptDetail from './pages/QuizAttemptDetail';
 
 function PrivateRoute({ children }) {
     const { isAuthenticated, loading } = useAuth();
@@ -40,6 +41,10 @@ function AppRoutes() {
 
             <Route path="/quiz/:id" element={
                 <PrivateRoute><Quiz /></PrivateRoute>
+            } />
+
+            <Route path="/results/:id" element={
+                <PrivateRoute><QuizAttemptDetail /></PrivateRoute>
             } />
 
             <Route path="/results" element={

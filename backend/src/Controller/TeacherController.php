@@ -21,4 +21,14 @@ class TeacherController extends AbstractController
             'teachers' => $teachers,
         ]);
     }
+    #[Route('/student/{id}/history', name: 'teacher_student_history', methods: ['GET'])]
+    public function studentHistory(\App\Entity\Student $student, \App\Repository\QuizAttemptRepository $attemptRepository): Response
+    {
+        $attempts = $attemptRepository->findBy(['student' => $student], ['submittedAt' => 'DESC']);
+
+        return $this->render('teacher/student_history.html.twig', [
+            'student' => $student,
+            'attempts' => $attempts,
+        ]);
+    }
 }

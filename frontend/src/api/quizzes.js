@@ -20,6 +20,17 @@ export const submitQuizAttempt = async (quizId, answers, timeSpent) => {
 };
 
 export const getMyResults = async (studentId) => {
-    const response = await api.get(`/api/quiz_attempts?student=${studentId}`);
-    return response.data['hydra:member'] || response.data;
+    // API Platform often requires the IRI for relation filters
+    const validId = studentId.toString().includes('/api/') ? studentId : `/api/students/${studentId}`;
+    try {
+        const response = await api.get(`/api/quiz_attempts?student=${validId}`);
+        return response.data['hydra:member'] || response.data;
+    } catch (e) {
+        // Fallback: try with raw ID if IRI fails (though IRI is standard)
+        if (!studentId.toString().includes('/api/')) {
+            const responseRetry = await api.get(`/api/quiz_attempts?student=${studentId}`);
+            return responseRetry.data['hydra:member'] || responseRetry.data;
+        }
+        throw e;
+    }
 };

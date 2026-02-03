@@ -48,7 +48,7 @@ class Quiz
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['quiz:list', 'quiz:read', 'course:read', 'quiz:write'])]
+    #[Groups(['quiz:list', 'quiz:read', 'course:read', 'quiz:write', 'quiz_attempt:read'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -57,7 +57,7 @@ class Quiz
 
     #[ORM\ManyToOne(inversedBy: 'quizzes')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['quiz:list', 'quiz:read', 'quiz:write'])]
+    #[Groups(['quiz:list', 'quiz:read', 'quiz:write', 'quiz_attempt:read'])]
     private ?Course $course = null;
 
     /** @var Collection<int, Question> */

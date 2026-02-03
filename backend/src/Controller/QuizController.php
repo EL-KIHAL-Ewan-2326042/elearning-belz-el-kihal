@@ -56,4 +56,12 @@ class QuizController extends AbstractController
             'averageScore' => $averageScore,
         ]);
     }
+    #[Route('/attempt/{id}', name: 'quiz_attempt_detail', methods: ['GET'])]
+    public function attemptDetail(\App\Entity\QuizAttempt $attempt): Response
+    {
+        return $this->render('quiz/attempt_detail.html.twig', [
+            'attempt' => $attempt,
+            'quiz' => $attempt->getQuiz(),
+        ]);
+    }
 }

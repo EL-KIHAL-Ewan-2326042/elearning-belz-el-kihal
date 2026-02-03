@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique - {{ student.firstName }} {{ student.lastName }}{% endblock %}
+
+{% block body %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ path('course_index') }}">Accueil</a></li>
+        <li class="breadcrumb-item active">Historique Étudiant</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">
+        <i class="bi bi-person-lines-fill me-2"></i> Historique : {{ student.firstName }} {{ student.lastName }}
+    </h1>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>QCM</th>
+                    <th>Cours</th>
+                    <th class="text-center">Score</th>
+                    <th class="text-center">Pourcentage</th>
+                    <th class="text-center">Temps</th>
+                    <th>Date</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attempt in attempts %}
+                    {% set percentage = (attempt.score / attempt.maxScore * 100)|round(1) %}
+                    <tr>
+                        <td><strong>{{ attempt.quiz.title }}</strong></td>
+                        <td>{{ attempt.quiz.course.title }}</td>
+                        <td class="text-center">
+                            {{ attempt.score }}/{{ attempt.maxScore }}
+                        </td>
+                        <td class="text-center">
+                            <span class="badge {% if percentage >= 70 %}bg-success{% elseif percentage >= 50 %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ percentage }}%
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            {% set minutes = (attempt.timeSpentSeconds / 60)|round(0, 'floor') %}
+                            {% set seconds = attempt.timeSpentSeconds % 60 %}
+                            {{ minutes }}:{{ "%02d"|format(seconds) }}
+                        </td>
+                        <td>
+                            {{ attempt.submittedAt|date('d/m/Y H:i') }}
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ path('quiz_attempt_detail', {id: attempt.id}) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i> Détails
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

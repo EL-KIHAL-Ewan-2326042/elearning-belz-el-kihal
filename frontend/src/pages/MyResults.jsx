@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { getMyResults } from '../api/quizzes';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
@@ -8,6 +8,7 @@ import ScoreBadge from '../components/ScoreBadge';
 export default function MyResults() {
     const { user } = useAuth();
     const location = useLocation();
+    const navigate = useNavigate();
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -17,8 +18,28 @@ export default function MyResults() {
         const fetchResults = async () => {
             try {
                 if (user?.id) {
+                    const searchParams = new URLSearchParams(location.search);
+                    const courseId = searchParams.get('course');
+
+                    let url = `/api/quiz_attempts?student=${user.id}`;
+                    if (courseId) {
+                        // We need to filter by quiz.course, but typically this requires a subresource or a custom filter
+                        // Easier: fetch all and filter client side OR use the nested filter if enabled
+                        // I enabled: properties: ['student' => 'exact', 'quiz' => 'exact']
+                        // Wait, I didn't enable 'quiz.course'. 
+                        // Let's rely on client side filtering or fetch by quiz if the user wants. 
+                        // Actually, 'quiz.course' filter is not enabled. 
+                        // Let's just fetch all and filter in JS for now to be safe and quick.
+                    }
+
                     const data = await getMyResults(user.id);
-                    setResults(data);
+
+                    let filteredData = data;
+                    if (courseId) {
+                        filteredData = data.filter(r => r.quiz?.course?.id == courseId || r.quiz?.course == `/api/courses/${courseId}`);
+                    }
+
+                    setResults(filteredData);
                 }
             } catch (err) {
                 setError('Erreur lors du chargement des résultats');
@@ -94,7 +115,8 @@ export default function MyResults() {
                                     {results.map((result, index) => (
                                         <tr
                                             key={result.id}
-                                            className={`border-b border-gray-100 hover:bg-gray-50 transition ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                                            onClick={() => navigate(`/results/${result.id}`)}
+                                            className={`border-b border-gray-100 hover:bg-gray-100 transition cursor-pointer ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
                                                 }`}
                                         >
                                             <td className="px-6 py-4 font-medium">
