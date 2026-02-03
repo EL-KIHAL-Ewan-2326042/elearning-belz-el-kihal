@@ -22,7 +22,7 @@ class CourseController extends AbstractController
     #[Route('', name: 'course_index', methods: ['GET'])]
     public function index(CourseRepository $courseRepository): Response
     {
-        $courses = $courseRepository->findBy([], ['createdAt' => 'DESC']);
+        $courses = $courseRepository->findBy(['teacher' => $this->getUser()], ['createdAt' => 'DESC']);
         
         return $this->render('course/index.html.twig', [
             'courses' => $courses,
@@ -53,6 +53,10 @@ class CourseController extends AbstractController
     #[Route('/{id}', name: 'course_show', methods: ['GET'])]
     public function show(Course $course): Response
     {
+        if ($course->getTeacher() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas accéder à ce cours.');
+        }
+
         return $this->render('course/show.html.twig', [
             'course' => $course,
         ]);
@@ -61,6 +65,10 @@ class CourseController extends AbstractController
     #[Route('/{id}/edit', name: 'course_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Course $course, EntityManagerInterface $em): Response
     {
+        if ($course->getTeacher() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas modifier ce cours.');
+        }
+
         $form = $this->createForm(CourseType::class, $course);
         $form->handleRequest($request);
 
@@ -80,6 +88,10 @@ class CourseController extends AbstractController
     #[Route('/{id}/delete', name: 'course_delete', methods: ['POST'])]
     public function delete(Request $request, Course $course, EntityManagerInterface $em): Response
     {
+        if ($course->getTeacher() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas supprimer ce cours.');
+        }
+
         if ($this->isCsrfTokenValid('delete' . $course->getId(), $request->request->get('_token'))) {
             $em->remove($course);
             $em->flush();
