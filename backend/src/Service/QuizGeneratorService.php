@@ -7,119 +7,107 @@ use App\Entity\Course;
 use App\Entity\Question;
 use App\Entity\Quiz;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\AI\Platform\PlatformInterface;
-use Symfony\AI\Platform\Message\UserMessage;
+use Psr\Log\LoggerInterface;
 
 class QuizGeneratorService
 {
     public function __construct(
-        private PlatformInterface $platform,
-        private EntityManagerInterface $em
-    ) {}
-
-    public function generateFromCourse(Course $course, int $questionCount = 10): Quiz
-    {
-        $content = $this->extractCourseContent($course);
-        
-        $prompt = <<<PROMPT
-Tu es un expert en création de QCM pédagogiques.
-Génère exactement {$questionCount} questions de QCM basées sur le contenu suivant :
-
-{$content}
-
-IMPORTANT: Réponds UNIQUEMENT avec du JSON valide, sans texte avant ou après.
-
-Format JSON attendu :
-{
-    "title": "QCM - [Titre basé sur le contenu]",
-    "description": "[Description courte du QCM]",
-    "questions": [
-        {
-            "content": "[Texte de la question]",
-            "answers": [
-                {"content": "[Réponse A]", "isCorrect": false},
-                {"content": "[Réponse B]", "isCorrect": true},
-                {"content": "[Réponse C]", "isCorrect": false},
-                {"content": "[Réponse D]", "isCorrect": false}
-            ]
-        }
-    ]
-}
-
-Règles :
-- Chaque question doit avoir exactement 4 réponses
-- Une seule réponse correcte par question
-- Questions variées et pertinentes par rapport au contenu
-- Niveau adapté à des étudiants
-PROMPT;
-
-        $response = $this->platform->invoke('openai:gpt-4o-mini', new UserMessage($prompt));
-        $responseContent = $response->asText();
-        $jsonStart = strpos($responseContent, '{');
-        $jsonEnd = strrpos($responseContent, '}') + 1;
-        $jsonString = substr($responseContent, $jsonStart, $jsonEnd - $jsonStart);
-        
-        $quizData = json_decode($jsonString, true);
-        
-        if (!$quizData) {
-            throw new \RuntimeException('Impossible de parser la réponse IA: ' . json_last_error_msg());
-        }
-        
-        return $this->createQuizFromData($course, $quizData);
+        private EntityManagerInterface $em,
+        private PdfParserService $pdfParser,
+        private VideoTranscriberService $videoTranscriber,
+        private AiQuizService $aiQuizService,
+        private LoggerInterface $logger
+    ) {
     }
 
-    private function extractCourseContent(Course $course): string
+    public function generateQuizFromCourse(Course $course, int $questionCount = 5): Quiz
     {
-        $content = "Titre du cours: {$course->getTitle()}\n";
-        $content .= "Description: {$course->getDescription()}\n\n";
-        
-        if ($course->getSummary()) {
-            $content .= "Résumé: {$course->getSummary()}\n\n";
-        }
-        
-        foreach ($course->getVideos() as $video) {
-            $content .= "Vidéo: {$video->getTitle()}\n";
-            if ($video->getDescription()) {
-                $content .= "Description: {$video->getDescription()}\n";
-            }
-            $content .= "\n";
-        }
-        
+        // 1. Extraire tout le contenu
+        $fullContent = $this->extractContent($course);
+
+        // 2. Générer les questions via IA
+        $questionsData = $this->aiQuizService->generateQuizFromText($fullContent, $questionCount);
+
+        // 3. Créer le QCM en base
+        return $this->createQuizEntity($course, $questionsData);
+    }
+
+    private function extractContent(Course $course): string
+    {
+        $content = "Titre: " . $course->getTitle() . "\n";
+        $content .= "Description: " . $course->getDescription() . "\n";
+        $content .= "Résumé: " . $course->getSummary() . "\n\n";
+
+        // Documents PDF
         foreach ($course->getDocuments() as $document) {
-            $content .= "Document: {$document->getTitle()}\n";
-            if ($document->getDescription()) {
-                $content .= "Description: {$document->getDescription()}\n";
+            try {
+                if ($document->getFileName()) {
+                    // Supposons que les fichiers sont dans public/uploads/documents/
+                    // VichUploader stocke le nom de fichier, le chemin complet dépend de la config
+                    // On va essayer de deviner le chemin absolu
+                    $filePath = __DIR__ . '/../../public/uploads/documents/' . $document->getFileName();
+                    
+                    if (file_exists($filePath)) {
+                        $text = $this->pdfParser->parsePdf($filePath);
+                        $content .= "Contenu du document '{$document->getTitle()}':\n" . substr($text, 0, 5000) . "\n\n";
+                    }
+                }
+            } catch (\Exception $e) {
+                $this->logger->error("Erreur parsing PDF: " . $e->getMessage());
             }
-            $content .= "\n";
         }
-        
+
+        // Vidéos
+        foreach ($course->getVideos() as $video) {
+            try {
+                // Pour l'instant on utilise le titre et la description
+                // Si on a le système de transcription, on l'appelle ici
+                $content .= "Vidéo '{$video->getTitle()}': " . $video->getDescription() . "\n";
+                
+                // Si transcription dispo (fichier vidéo uploadé)
+                /*
+                if ($video->getFileName()) {
+                    $videoPath = __DIR__ . '/../../public/uploads/videos/' . $video->getFileName();
+                    if (file_exists($videoPath)) {
+                        $transcription = $this->videoTranscriber->transcribe($videoPath);
+                        $content .= "Transcription: " . $transcription . "\n";
+                    }
+                }
+                */
+            } catch (\Exception $e) {
+                $this->logger->error("Erreur transcription vidéo: " . $e->getMessage());
+            }
+        }
+
         return $content;
     }
 
-    private function createQuizFromData(Course $course, array $data): Quiz
+    private function createQuizEntity(Course $course, array $questionsData): Quiz
     {
         $quiz = new Quiz();
-        $quiz->setTitle($data['title'] ?? 'QCM - ' . $course->getTitle());
-        $quiz->setDescription($data['description'] ?? null);
+        $quiz->setTitle('QCM IA - ' . $course->getTitle());
         $quiz->setCourse($course);
-        $quiz->setCreatedAt(new \DateTime());
         $quiz->setIsGeneratedByAI(true);
+        $quiz->setCreatedAt(new \DateTime());
+        $quiz->setDescription("QCM généré automatiquement par IA basé sur le contenu du cours.");
 
-        foreach ($data['questions'] ?? [] as $index => $qData) {
+        foreach ($questionsData as $index => $qData) {
             $question = new Question();
             $question->setContent($qData['content']);
             $question->setOrderNumber($index + 1);
             $question->setPoints(1);
             $question->setQuiz($quiz);
-            $quiz->addQuestion($question);
 
-            foreach ($qData['answers'] ?? [] as $aData) {
+            foreach ($qData['answers'] as $aData) {
                 $answer = new Answer();
                 $answer->setContent($aData['content']);
-                $answer->setIsCorrect($aData['isCorrect'] ?? false);
+                $answer->setIsCorrect($aData['isCorrect']);
                 $answer->setQuestion($question);
+                
                 $question->addAnswer($answer);
             }
+
+            $quiz->addQuestion($question);
         }
 
         $this->em->persist($quiz);

@@ -98,7 +98,7 @@ class CourseController extends AbstractController
         if ($this->isCsrfTokenValid('generate_quiz' . $course->getId(), $request->request->get('_token'))) {
             try {
                 $questionCount = (int) $request->request->get('question_count', 10);
-                $quiz = $quizGenerator->generateFromCourse($course, $questionCount);
+                $quiz = $quizGenerator->generateQuizFromCourse($course, $questionCount);
                 $this->addFlash('success', "QCM '{$quiz->getTitle()}' généré avec succès ({$quiz->getQuestions()->count()} questions) !");
             } catch (\Exception $e) {
                 $this->addFlash('danger', 'Erreur lors de la génération du QCM : ' . $e->getMessage());
