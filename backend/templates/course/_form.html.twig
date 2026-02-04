@@ -44,10 +44,7 @@
                     <div class="card-body">
                         {{ form_row(video.title) }}
                         {{ form_row(video.description) }}
-                        <div class="row">
-                            <div class="col-md-6">{{ form_row(video.videoFile) }}</div>
-                            <div class="col-md-6">{{ form_row(video.url) }}</div>
-                        </div>
+                        <div class="col-md-12">{{ form_row(video.videoFile) }}</div>
                     </div>
                 </div>
             {% endfor %}
@@ -68,6 +65,90 @@
 {{ form_end(form) }}
 
 <script>
+// Loading Overlay Script
+document.querySelector('form').addEventListener('submit', function(e) {
+    const fileInputs = this.querySelectorAll('input[type="file"]');
+    let hasFile = false;
+    
+    fileInputs.forEach(input => {
+        if (input.files.length > 0) {
+            hasFile = true;
+        }
+    });
+
+    if (hasFile) {
+        // Generate unique Progress ID
+        const progressId = 'transcription_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        
+        // Add hidden input with ID
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'transcription_progress_id';
+        input.value = progressId;
+        this.appendChild(input);
+
+        // Show overlay
+        const overlay = document.getElementById('upload-overlay');
+        const progressBar = overlay.querySelector('.progress-bar');
+        const statusText = overlay.querySelector('h3');
+        overlay.classList.remove('d-none');
+        
+        // Prevent double submit
+        const btn = this.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Traitement...';
+
+        // Recursive polling function
+        let failures = 0;
+        let isComplete = false;
+
+        const pollProgress = () => {
+            if (isComplete) return;
+
+            fetch('/api/transcription-progress/' + progressId)
+                .then(response => {
+                    if (!response.ok) throw new Error("Network request failed");
+                    return response.json();
+                })
+                .then(data => {
+                    failures = 0; 
+                    if (data.progress) {
+                        let pct = Math.round(data.progress);
+                        if (pct > 100) pct = 100;
+                        progressBar.style.width = pct + '%';
+                        progressBar.innerText = pct + '%';
+                        statusText.innerText = `Transcription en cours : ${pct}%`;
+                        
+                        if (pct >= 100) {
+                            isComplete = true;
+                            statusText.innerText = "Finalisation...";
+                            return; // Stop polling
+                        }
+                    }
+                    // Schedule next poll only after response received
+                    setTimeout(pollProgress, 2000);
+                })
+                .catch(err => {
+                    console.error("Polling error:", err);
+                    failures++;
+                    
+                    if (failures > 5) {
+                         statusText.innerHTML = "Le serveur est occupé...<br><small>La transcription continue en arrière-plan.</small>";
+                         progressBar.classList.add('bg-warning');
+                         // Even if blocked, we try slowly (every 10s) to see if it unblocks
+                         setTimeout(pollProgress, 10000);
+                    } else {
+                        // Retry normally
+                        setTimeout(pollProgress, 2000);
+                    }
+                });
+        };
+
+        // Start the first poll
+        setTimeout(pollProgress, 2000);
+    }
+});
+
 document.querySelectorAll('.add_item_link').forEach(btn => {
     btn.addEventListener('click', (e) => {
         const collectionHolder = document.querySelector('.' + e.currentTarget.dataset.collectionHolderClass);
@@ -94,3 +175,17 @@ document.querySelectorAll('.add_item_link').forEach(btn => {
     });
 });
 </script>
+
+<!-- Full Screen Loading Overlay -->
+<div id="upload-overlay" class="d-none position-fixed top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center" style="background: rgba(255, 255, 255, 0.9); z-index: 9999; backdrop-filter: blur(5px);">
+    <div class="spinner-border text-primary" style="width: 4rem; height: 4rem;" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <h3 class="mt-4 text-dark fw-bold">Upload et Transcription en cours...</h3>
+    <p class="text-muted fs-5">L'intelligence artificielle analyse votre contenu.</p>
+    <p class="text-secondary small">Cela peut prendre plusieurs minutes selon la taille de la vidéo.</p>
+    <div class="progress w-50 mt-3" style="height: 4px;">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+    </div>
+    <p class="text-muted small mt-2 fst-italic"><i class="bi bi-info-circle me-1"></i> En local, la barre peut rester figée si le serveur est occupé. La transcription continue quand même !</p>
+</div>

@@ -40,9 +40,14 @@ export default function Navbar() {
                             </div>
                         </>
                     ) : (
-                        <Link to="/login" className="btn btn-primary no-underline">
-                            🔐 Connexion
-                        </Link>
+                        <div className="flex items-center gap-4">
+                            <Link to="/register" className="btn bg-gray-200 text-gray-700 hover:bg-gray-300 no-underline">
+                                S'enregistrer
+                            </Link>
+                            <Link to="/login" className="btn btn-primary no-underline">
+                                🔐 Connexion
+                            </Link>
+                        </div>
                     )}
                 </div>
             </div>

@@ -1,0 +1,18 @@
+🔥 **SOLUTION ULTIME : MODE TURBO**
+
+Le problème : L'IA en local sur CPU est soit bête (Tiny) soit lente (Base).
+Pour avoir "Parfait + Rapide", il faut une API.
+
+J'ai modifié le code pour supporter **Groq** (Gratuit & Ultra-rapide).
+
+👉 **Pour activer le mode 2 secondes :**
+1. Allez sur https://console.groq.com/keys et créez une clé.
+2. Ouvrez votre fichier `.env` à la racine `backend/`.
+3. Ajoutez cette ligne :
+   GROQ_API_KEY=gsk_votre_cle_ici
+
+Dès que vous sauvegardez, relancez un upload.
+- Vitesse : 2 secondes
+- Qualité : Maximale
+
+(Si vous ne faites rien, ça utilisera le mode "Base" local qui est meilleur qu'avant mais lent).

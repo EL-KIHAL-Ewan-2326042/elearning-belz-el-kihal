@@ -13,8 +13,6 @@ class QuizGeneratorService
 {
     public function __construct(
         private EntityManagerInterface $em,
-        private PdfParserService $pdfParser,
-        private VideoTranscriberService $videoTranscriber,
         private AiQuizService $aiQuizService,
         private LoggerInterface $logger
     ) {
@@ -40,42 +38,23 @@ class QuizGeneratorService
 
         // Documents PDF
         foreach ($course->getDocuments() as $document) {
-            try {
-                if ($document->getFileName()) {
-                    // Supposons que les fichiers sont dans public/uploads/documents/
-                    // VichUploader stocke le nom de fichier, le chemin complet dépend de la config
-                    // On va essayer de deviner le chemin absolu
-                    $filePath = __DIR__ . '/../../public/uploads/documents/' . $document->getFileName();
-                    
-                    if (file_exists($filePath)) {
-                        $text = $this->pdfParser->parsePdf($filePath);
-                        $content .= "Contenu du document '{$document->getTitle()}':\n" . substr($text, 0, 5000) . "\n\n";
-                    }
-                }
-            } catch (\Exception $e) {
-                $this->logger->error("Erreur parsing PDF: " . $e->getMessage());
+            $content .= "Document '{$document->getTitle()}':\n";
+            if ($document->getContent()) {
+                 // Limiter la taille pour éviter de saturer le prompt
+                $content .= substr($document->getContent(), 0, 5000) . "\n\n";
+            } else {
+                $content .= "(Contenu non extrait)\n\n";
             }
         }
 
         // Vidéos
         foreach ($course->getVideos() as $video) {
-            try {
-                // Pour l'instant on utilise le titre et la description
-                // Si on a le système de transcription, on l'appelle ici
-                $content .= "Vidéo '{$video->getTitle()}': " . $video->getDescription() . "\n";
-                
-                // Si transcription dispo (fichier vidéo uploadé)
-                /*
-                if ($video->getFileName()) {
-                    $videoPath = __DIR__ . '/../../public/uploads/videos/' . $video->getFileName();
-                    if (file_exists($videoPath)) {
-                        $transcription = $this->videoTranscriber->transcribe($videoPath);
-                        $content .= "Transcription: " . $transcription . "\n";
-                    }
-                }
-                */
-            } catch (\Exception $e) {
-                $this->logger->error("Erreur transcription vidéo: " . $e->getMessage());
+            $content .= "Vidéo '{$video->getTitle()}': " . $video->getDescription() . "\n";
+            if ($video->getTranscription()) {
+                 // Limiter la taille pour éviter de saturer le prompt
+                $content .= "Transcription:\n" . substr($video->getTranscription(), 0, 5000) . "\n\n";
+            } else {
+                $content .= "(Transcription non disponible)\n\n";
             }
         }
 

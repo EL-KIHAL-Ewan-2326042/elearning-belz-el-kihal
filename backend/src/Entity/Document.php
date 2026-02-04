@@ -30,6 +30,10 @@ class Document
     #[Groups(['course:read'])]
     private ?string $description = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['course:read'])]
+    private ?string $content = null;
+
     #[ORM\ManyToOne(inversedBy: 'documents')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Course $course = null;
@@ -115,6 +119,17 @@ class Document
     public function setUploadedAt(?\DateTimeInterface $uploadedAt): static
     {
         $this->uploadedAt = $uploadedAt;
+        return $this;
+    }
+
+    public function getContent(): ?string
+    {
+        return $this->content;
+    }
+
+    public function setContent(?string $content): static
+    {
+        $this->content = $content;
         return $this;
     }
 }

@@ -32,11 +32,7 @@
                         {{ form_errors(form.email) }}
                     </div>
                     
-                    <div class="mb-3">
-                        {{ form_label(form.specialty) }}
-                        {{ form_widget(form.specialty) }}
-                        {{ form_errors(form.specialty) }}
-                    </div>
+
                     
                     <div class="mb-3">
                         {{ form_label(form.plainPassword.first) }}
@@ -55,8 +51,15 @@
                     </button>
                     
                     <div class="text-center">
-                        <a href="{{ path('app_teacher_login') }}" class="text-decoration-none">
                             Déjà un compte ? Se connecter
+                        </a>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <a href="/" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i> Revenir à l'espace étudiant
                         </a>
                     </div>
                 {{ form_end(form) }}

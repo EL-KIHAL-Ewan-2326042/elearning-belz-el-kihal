@@ -33,11 +33,6 @@ class VideoType extends AbstractType
                 'asset_helper' => true,
                 'help' => 'Uploadez une vidéo locale', 
             ])
-            ->add('url', UrlType::class, [
-                'label' => 'OU Lien Vidéo (YouTube, etc.)',
-                'required' => false,
-                'attr' => ['class' => 'form-control', 'placeholder' => 'https://youtube.com/...'],
-            ])
         ;
     }
 

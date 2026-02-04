@@ -19,15 +19,30 @@ export default function QuizAttemptDetail() {
                 const attemptData = attemptRes.data;
                 setAttempt(attemptData);
 
-                // 2. Fetch Quiz details (to get questions and correct answers)
-                // The attempt has a link to the quiz, e.g., "/api/quizzes/12"
-                // We need to fetch it to get the full structure
-                const quizUrl = attemptData.quiz['@id'] || attemptData.quiz;
+                // 2. Fetch Quiz details
+                // Robust extraction of Quiz ID or URL
+                console.log('Attempt Data:', attemptData);
+
+                let quizUrl = null;
+                if (typeof attemptData.quiz === 'string') {
+                    quizUrl = attemptData.quiz;
+                } else if (attemptData.quiz?.['@id']) {
+                    quizUrl = attemptData.quiz['@id'];
+                } else if (attemptData.quiz?.id) {
+                    quizUrl = `/api/quizzes/${attemptData.quiz.id}`;
+                }
+
+                if (!quizUrl) {
+                    throw new Error("Impossible de trouver le lien vers le QCM.");
+                }
+
+                console.log('Fetching Quiz from:', quizUrl);
                 const quizRes = await api.get(quizUrl);
+                console.log('Quiz Data:', quizRes.data);
                 setQuiz(quizRes.data);
 
             } catch (err) {
-                console.error(err);
+                console.error('Detail Load Error:', err);
                 setError("Erreur lors du chargement des détails.");
             } finally {
                 setLoading(false);
@@ -63,8 +78,13 @@ export default function QuizAttemptDetail() {
 
     // Helper to find the student's answer for a question
     const getStudentAnswerId = (questionId) => {
+        if (!attempt?.answers) return null;
         return attempt.answers[questionId];
     };
+
+    if (!quiz.questions) {
+        return <div className="p-8 text-center text-red-600">Erreur: Les questions du QCM n'ont pas pu être chargées.</div>;
+    }
 
     return (
         <div className="min-h-screen bg-light">
@@ -73,7 +93,7 @@ export default function QuizAttemptDetail() {
 
                 {/* Header / Breadcrumb */}
                 <div className="mb-6">
-                    <Link to="/my-results" className="text-gray-500 hover:text-primary transition">
+                    <Link to="/results" className="text-gray-500 hover:text-primary transition">
                         ← Retour à mes résultats
                     </Link>
                 </div>
@@ -105,10 +125,16 @@ export default function QuizAttemptDetail() {
                     {quiz.questions.map((question, index) => {
                         const studentAnsId = getStudentAnswerId(question.id);
                         const studentAnswer = question.answers.find(a => a.id === studentAnsId);
-                        const correctAnswer = question.answers.find(a => a.isCorrect);
+
+                        // Robust check for correct answer property
+                        const correctAnswer = question.answers.find(a => a.isCorrect === true || a.correct === true);
 
                         const isCorrect = studentAnswer?.id === correctAnswer?.id;
-                        const isSkipped = !studentAnswer;
+
+                        // Debug log per question to see why correct answer might be missing
+                        if (!correctAnswer) {
+                            console.warn(`Question ${question.id}: No correct answer found in data`, question.answers);
+                        }
 
                         return (
                             <div key={question.id} className={`bg-white rounded-xl shadow p-6 border-l-8 ${isCorrect ? 'border-success' : 'border-danger'}`}>
@@ -122,8 +148,8 @@ export default function QuizAttemptDetail() {
                                         <div className="space-y-3">
                                             {/* Student's Answer */}
                                             <div className={`p-3 rounded-lg border flex items-center justify-between ${isCorrect
-                                                    ? 'bg-green-50 border-green-200 text-green-800'
-                                                    : 'bg-red-50 border-red-200 text-red-800'
+                                                ? 'bg-green-50 border-green-200 text-green-800'
+                                                : 'bg-red-50 border-red-200 text-red-800'
                                                 }`}>
                                                 <div>
                                                     <span className="font-semibold text-xs uppercase opacity-70 block mb-1">
@@ -142,7 +168,7 @@ export default function QuizAttemptDetail() {
                                                     <span className="font-semibold text-xs uppercase opacity-70 block mb-1">
                                                         La bonne réponse
                                                     </span>
-                                                    {correctAnswer ? correctAnswer.content : 'Non définie'}
+                                                    {correctAnswer ? correctAnswer.content : 'Non définie (voir console)'}
                                                 </div>
                                             )}
                                         </div>

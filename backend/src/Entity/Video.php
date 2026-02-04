@@ -34,6 +34,10 @@ class Video
     #[Groups(['course:read'])]
     private ?string $description = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['course:read'])]
+    private ?string $transcription = null;
+
     #[ORM\ManyToOne(inversedBy: 'videos')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Course $course = null;
@@ -145,6 +149,17 @@ class Video
     public function setUploadedAt(?\DateTimeInterface $uploadedAt): static
     {
         $this->uploadedAt = $uploadedAt;
+        return $this;
+    }
+
+    public function getTranscription(): ?string
+    {
+        return $this->transcription;
+    }
+
+    public function setTranscription(?string $transcription): static
+    {
+        $this->transcription = $transcription;
         return $this;
     }
 }

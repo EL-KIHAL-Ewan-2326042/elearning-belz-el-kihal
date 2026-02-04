@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="fr"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduLearn - Maquette Interactive</title>
+    <link href="edulearn_maquette_interactive_2026_fichiers/css2.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #0891b2;
+            --success: #10b981;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --light: #f1f5f9;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        /* NAVIGATION */
+        nav {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        /* CONTAINER */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* SECTION TITLES */
+        .section-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            color: var(--dark);
+        }
+
+        /* CAROUSEL */
+        .carousel-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .carousel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .carousel-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .carousel-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .carousel-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: var(--light);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 18px;
+            color: var(--dark);
+        }
+
+        .carousel-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .carousel {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 10px 0;
+        }
+
+        .carousel::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .carousel::-webkit-scrollbar-track {
+            background: var(--light);
+            border-radius: 10px;
+        }
+
+        .carousel::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .carousel-item {
+            min-width: 300px;
+            background: var(--light);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .carousel-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .carousel-item-video {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: white;
+            position: relative;
+        }
+
+        .play-btn {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .carousel-item-document {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: white;
+        }
+
+        .carousel-item-content {
+            padding: 20px;
+        }
+
+        .carousel-item-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .carousel-item-meta {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+
+        .btn-generate-qcm {
+            width: 100%;
+            padding: 10px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-generate-qcm:hover {
+            background: #059669;
+            transform: scale(1.02);
+        }
+
+        .btn-take-qcm {
+            width: 100%;
+            padding: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-take-qcm:hover {
+            background: var(--secondary);
+            transform: scale(1.02);
+        }
+
+        /* MODAL/POPUP */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 450px;
+            padding: 40px;
+            position: relative;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: var(--light);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--dark);
+        }
+
+        .modal-close:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .modal-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--light);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-input[type="file"] {
+            padding: 10px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .modal-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--light);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* RESULTS TABLE */
+        .results-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+        .results-table thead {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 16px;
+            text-align: left;
+        }
+
+        .results-table tbody tr {
+            border-bottom: 1px solid var(--light);
+            transition: all 0.2s;
+        }
+
+        .results-table tbody tr:hover {
+            background: var(--light);
+        }
+
+        .score-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .score-excellent {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .score-good {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .score-average {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .score-poor {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* UPLOAD SECTION */
+        .upload-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 40px;
+        }
+
+        .upload-area {
+            border: 3px dashed var(--primary);
+            border-radius: 12px;
+            padding: 60px 20px;
+            text-align: center;
+            background: var(--light);
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            background: #dbeafe;
+            border-color: var(--secondary);
+        }
+
+        .upload-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .upload-subtext {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .file-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .file-icon {
+            font-size: 32px;
+        }
+
+        .file-details {
+            font-size: 14px;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .file-size {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .btn-remove {
+            padding: 8px 16px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-remove:hover {
+            background: #dc2626;
+        }
+
+        /* DETAILS MODAL */
+        .details-row {
+            background: var(--light);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 10px;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .details-row.show {
+            display: block;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .questions-breakdown {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .questions-breakdown h4 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: var(--dark);
+        }
+
+        .question-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--light);
+            font-size: 14px;
+        }
+
+        .question-item:last-child {
+            border-bottom: none;
+        }
+
+        .question-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-icon {
+            font-size: 16px;
+        }
+
+        .btn-close-details {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        .btn-close-details:hover {
+            background: #dc2626;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 20px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 800;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .carousel-item {
+                min-width: 250px;
+            }
+        }
+    </style>
+<meta name="dealabs-browser-extension" version="12.6.0"></head>
+<body>
+    <!-- NAVIGATION -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">🎓 EduLearn</div>
+            <div class="nav-buttons">
+                <button class="btn btn-primary" onclick="openLoginModal()">
+                    🔐 Connexion
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <div class="hero">
+        <h1>Plateforme d'Apprentissage Moderne</h1>
+        <p>Accédez à vos cours, regardez des vidéos, consultez des documents et passez des QCM générés par IA</p>
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number">150+</div>
+                <div class="stat-label">Cours disponibles</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">2,500+</div>
+                <div class="stat-label">Étudiants actifs</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">98%</div>
+                <div class="stat-label">Taux de satisfaction</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- CAROUSEL VIDÉOS -->
+        <div class="carousel-section">
+            <div class="carousel-header">
+                <h2>📹 Vidéos de Cours</h2>
+                <div class="carousel-controls">
+                    <button class="carousel-btn" onclick="scrollCarousel('videos', -300)">←</button>
+                    <button class="carousel-btn" onclick="scrollCarousel('videos', 300)">→</button>
+                </div>
+            </div>
+            <div class="carousel" id="videos">
+                <!-- Vidéo 1 -->
+                <div class="carousel-item">
+                    <div class="carousel-item-video">
+                        🎬
+                        <div class="play-btn">▶</div>
+                    </div>
+                    <div class="carousel-item-content">
+                        <div class="carousel-item-title">Introduction à Symfony</div>
+                        <div class="carousel-item-meta">👨‍🏫 Prof. Martin • ⏱️ 45 min</div>
+                        <button class="btn-generate-qcm" onclick="generateQCM('video', 1)" style="margin-bottom: 10px;">
+                            🤖 Générer QCM (Prof)
+                        </button>
+                        <button class="btn-take-qcm" onclick="takeQCM('Introduction à Symfony')">
+                            ✏️ Passer le QCM
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Vidéo 2 -->
+                <div class="carousel-item">
+                    <div class="carousel-item-video">
+                        🎬
+                        <div class="play-btn">▶</div>
+                    </div>
+                    <div class="carousel-item-content">
+                        <div class="carousel-item-title">Security Bundle</div>
+                        <div class="carousel-item-meta">👨‍🏫 Prof. Dubois • ⏱️ 60 min</div>
+                        <button class="btn-generate-qcm" onclick="generateQCM('video', 2)" style="margin-bottom: 10px;">
+                            🤖 Générer QCM (Prof)
+                        </button>
+                        <button class="btn-take-qcm" onclick="takeQCM('Security Bundle')">
+                            ✏️ Passer le QCM
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Vidéo 3 -->
+                <div class="carousel-item">
+                    <div class="carousel-item-video">
+                        🎬
+                        <div class="play-btn">▶</div>
+                    </div>
+                    <div class="carousel-item-content">
+                        <div class="carousel-item-title">API Platform</div>
+                        <div class="carousel-item-meta">👨‍🏫 Prof. Bernard • ⏱️ 50 min</div>
+                        <button class="btn-generate-qcm" onclick="generateQCM('video', 3)" style="margin-bottom: 10px;">
+                            🤖 Générer QCM (Prof)
+                        </button>
+                        <button class="btn-take-qcm" onclick="takeQCM('API Platform')">
+                            ✏️ Passer le QCM
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Vidéo 4 -->
+                <div class="carousel-item">
+                    <div class="carousel-item-video">
+                        🎬
+                        <div class="play-btn">▶</div>
+                    </div>
+                    <div class="carousel-item-content">
+                        <div class="carousel-item-title">Doctrine ORM</div>
+                        <div class="carousel-item-meta">👨‍🏫 Prof. Laurent • ⏱️ 55 min</div>
+                        <button class="btn-generate-qcm" onclick="generateQCM('video', 4)" style="margin-bottom: 10px;">
+                            🤖 Générer QCM (Prof)
+                        </button>
+                        <button class="btn-take-qcm" onclick="takeQCM('Doctrine ORM')">
+                            ✏️ Passer le QCM
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Vidéo 5 -->
+                <div class="carousel-item">
+                    <div class="carousel-item-video">
+                        🎬
+                        <div class="play-btn">▶</div>
+                    </div>
+                    <div class="carousel-item-content">
+                        <div class="carousel-item-title">Twig Templates</div>
+                        <div class="carousel-item-meta">👨‍🏫 Prof. Sophie • ⏱️ 40 min</div>
+                        <button class="btn-generate-qcm" onclick="generateQCM('video', 5)" style="margin-bottom: 10px;">
+                            🤖 Générer QCM (Prof)
+                        </button>
+                        <button class="btn-take-qcm" onclick="takeQCM('Twig Templates')">
+                            ✏️ Passer le QCM
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CAROUSEL DOCUMENTS -->
+        <div class="carousel-section">
+            <div class="carousel-header">
+                <h2>📄 Documents de Cours</h2>
+                <div class="carousel-controls">
+                    <button class="carousel-btn" onclick="scrollCarousel('documents', -300)">←</button>
+                    <button class="carousel-btn" onclick="scrollCarousel('documents', 300)">→</button>
+                </div>
+            </div>
+            <div class="carousel" id="documents">
+                <!-- Document 1 -->
+                <div class="carousel-item">
+                    <div class="carousel-item-document">
+                        📑
+                    </div>
+                    <div class="carousel-item-content">
+                        <div class="carousel-item-title">Guide Symfony 7</div>
+                        <div class="carousel-item-meta">👨‍🏫 Prof. Martin • 📄 25 pages</div>
+                        <button class="btn-generate-qcm" onclick="generateQCM('document', 1)" style="margin-bottom: 10px;">
+                            🤖 Générer QCM (Prof)
+                        </button>
+                        <button class="btn-take-qcm" onclick="takeQCM('Guide Symfony 7')">
+                            ✏️ Passer le QCM
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Document 2 -->
+                <div class="carousel-item">
+                    <div class="carousel-item-document">
+                        📑
+                    </div>
+                    <div class="carousel-item-content">
+                        <div class="carousel-item-title">Architecture MVC</div>
+                        <div class="carousel-item-meta">👨‍🏫 Prof. Dubois • 📄 18 pages</div>
+                        <button class="btn-generate-qcm" onclick="generateQCM('document', 2)" style="margin-bottom: 10px;">
+                            🤖 Générer QCM (Prof)
+                        </button>
+                        <button class="btn-take-qcm" onclick="takeQCM('Architecture MVC')">
+                            ✏️ Passer le QCM
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Document 3 -->
+                <div class="carousel-item">
+                    <div class="carousel-item-document">
+                        📑
+                    </div>
+                    <div class="carousel-item-content">
+                        <div class="carousel-item-title">REST API Best Practices</div>
+                        <div class="carousel-item-meta">👨‍🏫 Prof. Bernard • 📄 30 pages</div>
+                        <button class="btn-generate-qcm" onclick="generateQCM('document', 3)" style="margin-bottom: 10px;">
+                            🤖 Générer QCM (Prof)
+                        </button>
+                        <button class="btn-take-qcm" onclick="takeQCM('REST API Best Practices')">
+                            ✏️ Passer le QCM
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Document 4 -->
+                <div class="carousel-item">
+                    <div class="carousel-item-document">
+                        📑
+                    </div>
+                    <div class="carousel-item-content">
+                        <div class="carousel-item-title">Database Design</div>
+                        <div class="carousel-item-meta">👨‍🏫 Prof. Laurent • 📄 22 pages</div>
+                        <button class="btn-generate-qcm" onclick="generateQCM('document', 4)" style="margin-bottom: 10px;">
+                            🤖 Générer QCM (Prof)
+                        </button>
+                        <button class="btn-take-qcm" onclick="takeQCM('Database Design')">
+                            ✏️ Passer le QCM
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Document 5 -->
+                <div class="carousel-item">
+                    <div class="carousel-item-document">
+                        📑
+                    </div>
+                    <div class="carousel-item-content">
+                        <div class="carousel-item-title">Frontend avec Twig</div>
+                        <div class="carousel-item-meta">👨‍🏫 Prof. Sophie • 📄 15 pages</div>
+                        <button class="btn-generate-qcm" onclick="generateQCM('document', 5)" style="margin-bottom: 10px;">
+                            🤖 Générer QCM (Prof)
+                        </button>
+                        <button class="btn-take-qcm" onclick="takeQCM('Frontend avec Twig')">
+                            ✏️ Passer le QCM
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- UPLOAD SECTION (PROFESSEUR) -->
+        <div class="upload-section" id="uploadSection" style="display: none;">
+            <h2 class="section-title">📤 Upload Vidéos &amp; Documents</h2>
+            
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">☁️</div>
+                <div class="upload-text">Glissez vos fichiers ici ou cliquez pour sélectionner</div>
+                <div class="upload-subtext">Formats acceptés : MP4, PDF, DOCX (Max 500MB)</div>
+            </div>
+            <input type="file" id="fileInput" style="display: none;" multiple="" onchange="handleFileSelect(event)">
+
+            <div class="file-list" id="fileList">
+                <!-- Les fichiers uploadés apparaîtront ici -->
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="uploadFiles()">
+                📤 Uploader tous les fichiers
+            </button>
+        </div>
+
+        <!-- RÉSULTATS DES QCM -->
+        <div class="results-section">
+            <div class="results-header">
+                <h2>📊 Résultats des QCM</h2>
+                <button class="btn btn-success" onclick="exportResults()">
+                    📥 Exporter en CSV
+                </button>
+            </div>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Étudiant</th>
+                        <th>QCM</th>
+                        <th>Date</th>
+                        <th>Score</th>
+                        <th>Note</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Alice Martin</strong></td>
+                        <td>Introduction à Symfony</td>
+                        <td>15/01/2026</td>
+                        <td>18/20</td>
+                        <td><span class="score-badge score-excellent">Excellent</span></td>
+                        <td><button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;" onclick="toggleDetails(1)">Voir détails</button></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" style="padding: 0;">
+                            <div class="details-row" id="details-1">
+                                <div class="details-grid">
+                                    <div class="detail-item">
+                                        <div class="detail-label">📝 Nombre de questions</div>
+                                        <div class="detail-value">10</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">✅ Bonnes réponses</div>
+                                        <div class="detail-value">9</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">❌ Mauvaises réponses</div>
+                                        <div class="detail-value">1</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">⏱️ Temps passé</div>
+                                        <div class="detail-value">18 min</div>
+                                    </div>
+                                </div>
+                                <div class="questions-breakdown">
+                                    <h4>📋 Détail des questions</h4>
+                                    <div class="question-item">
+                                        <span>Question 1 : Qu'est-ce que Symfony ?</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 2 : Architecture MVC</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 3 : Les bundles Symfony</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 4 : Doctrine ORM</span>
+                                        <div class="question-status"><span class="status-icon">❌</span> Incorrecte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 5 : Routing</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                </div>
+                                <button class="btn-close-details" onclick="toggleDetails(1)">Fermer</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Thomas Dubois</strong></td>
+                        <td>Security Bundle</td>
+                        <td>14/01/2026</td>
+                        <td>15/20</td>
+                        <td><span class="score-badge score-good">Bien</span></td>
+                        <td><button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;" onclick="toggleDetails(2)">Voir détails</button></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" style="padding: 0;">
+                            <div class="details-row" id="details-2">
+                                <div class="details-grid">
+                                    <div class="detail-item">
+                                        <div class="detail-label">📝 Nombre de questions</div>
+                                        <div class="detail-value">10</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">✅ Bonnes réponses</div>
+                                        <div class="detail-value">7</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">❌ Mauvaises réponses</div>
+                                        <div class="detail-value">3</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">⏱️ Temps passé</div>
+                                        <div class="detail-value">22 min</div>
+                                    </div>
+                                </div>
+                                <div class="questions-breakdown">
+                                    <h4>📋 Détail des questions</h4>
+                                    <div class="question-item">
+                                        <span>Question 1 : Authentification</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 2 : Firewall</span>
+                                        <div class="question-status"><span class="status-icon">❌</span> Incorrecte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 3 : Voters</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 4 : JWT Tokens</span>
+                                        <div class="question-status"><span class="status-icon">❌</span> Incorrecte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 5 : Encodeurs</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                </div>
+                                <button class="btn-close-details" onclick="toggleDetails(2)">Fermer</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sophie Bernard</strong></td>
+                        <td>API Platform</td>
+                        <td>13/01/2026</td>
+                        <td>12/20</td>
+                        <td><span class="score-badge score-average">Moyen</span></td>
+                        <td><button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;" onclick="toggleDetails(3)">Voir détails</button></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" style="padding: 0;">
+                            <div class="details-row" id="details-3">
+                                <div class="details-grid">
+                                    <div class="detail-item">
+                                        <div class="detail-label">📝 Nombre de questions</div>
+                                        <div class="detail-value">10</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">✅ Bonnes réponses</div>
+                                        <div class="detail-value">6</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">❌ Mauvaises réponses</div>
+                                        <div class="detail-value">4</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">⏱️ Temps passé</div>
+                                        <div class="detail-value">25 min</div>
+                                    </div>
+                                </div>
+                                <div class="questions-breakdown">
+                                    <h4>📋 Détail des questions</h4>
+                                    <div class="question-item">
+                                        <span>Question 1 : REST API</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 2 : Serialization</span>
+                                        <div class="question-status"><span class="status-icon">❌</span> Incorrecte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 3 : Filters</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 4 : Pagination</span>
+                                        <div class="question-status"><span class="status-icon">❌</span> Incorrecte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 5 : Operations</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                </div>
+                                <button class="btn-close-details" onclick="toggleDetails(3)">Fermer</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lucas Laurent</strong></td>
+                        <td>Doctrine ORM</td>
+                        <td>12/01/2026</td>
+                        <td>9/20</td>
+                        <td><span class="score-badge score-poor">À améliorer</span></td>
+                        <td><button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;" onclick="toggleDetails(4)">Voir détails</button></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" style="padding: 0;">
+                            <div class="details-row" id="details-4">
+                                <div class="details-grid">
+                                    <div class="detail-item">
+                                        <div class="detail-label">📝 Nombre de questions</div>
+                                        <div class="detail-value">10</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">✅ Bonnes réponses</div>
+                                        <div class="detail-value">4</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">❌ Mauvaises réponses</div>
+                                        <div class="detail-value">6</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">⏱️ Temps passé</div>
+                                        <div class="detail-value">28 min</div>
+                                    </div>
+                                </div>
+                                <div class="questions-breakdown">
+                                    <h4>📋 Détail des questions</h4>
+                                    <div class="question-item">
+                                        <span>Question 1 : Entities</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 2 : Repositories</span>
+                                        <div class="question-status"><span class="status-icon">❌</span> Incorrecte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 3 : Migrations</span>
+                                        <div class="question-status"><span class="status-icon">❌</span> Incorrecte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 4 : Relations</span>
+                                        <div class="question-status"><span class="status-icon">❌</span> Incorrecte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 5 : DQL</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                </div>
+                                <button class="btn-close-details" onclick="toggleDetails(4)">Fermer</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Emma Petit</strong></td>
+                        <td>Twig Templates</td>
+                        <td>11/01/2026</td>
+                        <td>17/20</td>
+                        <td><span class="score-badge score-excellent">Excellent</span></td>
+                        <td><button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;" onclick="toggleDetails(5)">Voir détails</button></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" style="padding: 0;">
+                            <div class="details-row" id="details-5">
+                                <div class="details-grid">
+                                    <div class="detail-item">
+                                        <div class="detail-label">📝 Nombre de questions</div>
+                                        <div class="detail-value">10</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">✅ Bonnes réponses</div>
+                                        <div class="detail-value">8</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">❌ Mauvaises réponses</div>
+                                        <div class="detail-value">2</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">⏱️ Temps passé</div>
+                                        <div class="detail-value">16 min</div>
+                                    </div>
+                                </div>
+                                <div class="questions-breakdown">
+                                    <h4>📋 Détail des questions</h4>
+                                    <div class="question-item">
+                                        <span>Question 1 : Syntaxe Twig</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 2 : Héritage</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 3 : Filtres</span>
+                                        <div class="question-status"><span class="status-icon">❌</span> Incorrecte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 4 : Blocks</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 5 : Extensions</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                </div>
+                                <button class="btn-close-details" onclick="toggleDetails(5)">Fermer</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hugo Moreau</strong></td>
+                        <td>Introduction à Symfony</td>
+                        <td>10/01/2026</td>
+                        <td>14/20</td>
+                        <td><span class="score-badge score-good">Bien</span></td>
+                        <td><button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;" onclick="toggleDetails(6)">Voir détails</button></td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" style="padding: 0;">
+                            <div class="details-row" id="details-6">
+                                <div class="details-grid">
+                                    <div class="detail-item">
+                                        <div class="detail-label">📝 Nombre de questions</div>
+                                        <div class="detail-value">10</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">✅ Bonnes réponses</div>
+                                        <div class="detail-value">7</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">❌ Mauvaises réponses</div>
+                                        <div class="detail-value">3</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">⏱️ Temps passé</div>
+                                        <div class="detail-value">20 min</div>
+                                    </div>
+                                </div>
+                                <div class="questions-breakdown">
+                                    <h4>📋 Détail des questions</h4>
+                                    <div class="question-item">
+                                        <span>Question 1 : Qu'est-ce que Symfony ?</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 2 : Architecture MVC</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 3 : Les bundles Symfony</span>
+                                        <div class="question-status"><span class="status-icon">❌</span> Incorrecte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 4 : Doctrine ORM</span>
+                                        <div class="question-status"><span class="status-icon">✅</span> Correcte</div>
+                                    </div>
+                                    <div class="question-item">
+                                        <span>Question 5 : Routing</span>
+                                        <div class="question-status"><span class="status-icon">❌</span> Incorrecte</div>
+                                    </div>
+                                </div>
+                                <button class="btn-close-details" onclick="toggleDetails(6)">Fermer</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MODAL CONNEXION -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeLoginModal()">×</button>
+            <div class="modal-title" id="modalTitle">Connexion</div>
+            <div class="modal-subtitle" id="modalSubtitle">Connectez-vous pour accéder à la plateforme</div>
+
+            <div class="modal-tabs">
+                <button class="tab-btn active" id="tabStudent" onclick="switchTab('student')">
+                    👨‍🎓 Étudiant
+                </button>
+                <button class="tab-btn" id="tabTeacher" onclick="switchTab('teacher')">
+                    👨‍🏫 Professeur
+                </button>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" placeholder="votre.email@exemple.com" required="">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Mot de passe</label>
+                    <input type="password" class="form-input" placeholder="••••••••" required="">
+                </div>
+                <button type="submit" class="btn-submit" onclick="handleLogin(event)">
+                    Se connecter
+                </button>
+            </form>
+
+            <p style="text-align: center; margin-top: 20px; color: #64748b; font-size: 14px;">
+                Pas encore de compte ? <a href="#" style="color: var(--primary); font-weight: 600;">S'inscrire</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let currentUserType = 'student';
+        let uploadedFiles = [];
+
+        // Gestion des carrousels
+        function scrollCarousel(id, amount) {
+            const carousel = document.getElementById(id);
+            carousel.scrollBy({ left: amount, behavior: 'smooth' });
+        }
+
+        // Gestion du modal de connexion
+        function openLoginModal() {
+            currentUserType = 'student';
+            document.getElementById('loginModal').classList.add('active');
+            switchTab('student');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('active');
+        }
+
+        function switchTab(type) {
+            currentUserType = type;
+            document.getElementById('tabStudent').classList.toggle('active', type === 'student');
+            document.getElementById('tabTeacher').classList.toggle('active', type === 'teacher');
+            
+            if (type === 'student') {
+                document.getElementById('modalTitle').textContent = 'Connexion Étudiant';
+                document.getElementById('modalSubtitle').textContent = 'Accédez à vos cours et QCM';
+            } else {
+                document.getElementById('modalTitle').textContent = 'Connexion Professeur';
+                document.getElementById('modalSubtitle').textContent = 'Gérez vos cours et évaluations';
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            // Simulation de connexion
+            alert(`Connexion réussie en tant que ${currentUserType === 'student' ? 'Étudiant' : 'Professeur'} !`);
+            
+            // Si professeur, afficher la section upload
+            if (currentUserType === 'teacher') {
+                document.getElementById('uploadSection').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('uploadSection').scrollIntoView({ behavior: 'smooth' });
+                }, 500);
+            }
+            
+            closeLoginModal();
+        }
+
+        // Génération de QCM
+        function generateQCM(type, id) {
+            const confirmMsg = `Voulez-vous générer un QCM automatique pour ce ${type === 'video' ? 'vidéo' : 'document'} ?`;
+            
+            if (confirm(confirmMsg)) {
+                // Animation de chargement
+                const btn = event.target;
+                btn.innerHTML = '⏳ Génération...';
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    btn.innerHTML = '✅ QCM Créé !';
+                    btn.style.background = '#10b981';
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = '🤖 Générer QCM (Prof)';
+                        btn.disabled = false;
+                        btn.style.background = '';
+                    }, 2000);
+                    
+                    alert('QCM généré avec succès ! 🎉\n\n• 10 questions créées\n• Difficulté progressive\n• Disponible pour les étudiants');
+                }, 2000);
+            }
+        }
+
+        // Passer le QCM (Étudiant)
+        function takeQCM(courseName) {
+            alert(`🎓 Démarrage du QCM : ${courseName}\n\n✓ 10 questions\n✓ Durée : 20 minutes\n✓ Note sur 20\n\nBonne chance ! 🍀`);
+            
+            // Simulation du passage de QCM
+            setTimeout(() => {
+                const score = Math.floor(Math.random() * 10) + 10; // Score entre 10 et 20
+                const message = score >= 16 ? '🌟 Excellent travail !' : 
+                               score >= 13 ? '👍 Bien joué !' : 
+                               score >= 10 ? '💪 Continuez vos efforts !' : 
+                               '📚 Révisez et réessayez !';
+                
+                alert(`✅ QCM Terminé !\n\nVotre score : ${score}/20\n${message}`);
+            }, 1000);
+        }
+
+        // Gestion des fichiers
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            
+            files.forEach(file => {
+                const fileObj = {
+                    id: Date.now() + Math.random(),
+                    name: file.name,
+                    size: formatFileSize(file.size),
+                    type: file.type.includes('video') ? '🎬' : '📄'
+                };
+                
+                uploadedFiles.push(fileObj);
+                addFileToList(fileObj);
+            });
+        }
+
+        function addFileToList(file) {
+            const fileList = document.getElementById('fileList');
+            
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.id = `file-${file.id}`;
+            fileItem.innerHTML = `
+                <div class="file-info">
+                    <div class="file-icon">${file.type}</div>
+                    <div class="file-details">
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${file.size}</div>
+                    </div>
+                </div>
+                <button class="btn-remove" onclick="removeFile(${file.id})">❌ Supprimer</button>
+            `;
+            
+            fileList.appendChild(fileItem);
+        }
+
+        function removeFile(fileId) {
+            uploadedFiles = uploadedFiles.filter(f => f.id !== fileId);
+            document.getElementById(`file-${fileId}`).remove();
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function uploadFiles() {
+            if (uploadedFiles.length === 0) {
+                alert('Veuillez sélectionner au moins un fichier.');
+                return;
+            }
+            
+            // Simulation d'upload
+            const btn = event.target;
+            btn.innerHTML = '⏳ Upload en cours...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.innerHTML = '✅ Upload terminé !';
+                btn.style.background = '#10b981';
+                
+                alert(`${uploadedFiles.length} fichier(s) uploadé(s) avec succès ! 🎉`);
+                
+                setTimeout(() => {
+                    uploadedFiles = [];
+                    document.getElementById('fileList').innerHTML = '';
+                    btn.innerHTML = '📤 Uploader tous les fichiers';
+                    btn.disabled = false;
+                    btn.style.background = '';
+                }, 2000);
+            }, 2000);
+        }
+
+        // Export des résultats
+        function exportResults() {
+            alert('Export CSV en cours... 📥\n\nLes résultats seront téléchargés dans quelques secondes.');
+        }
+
+        // Toggle des détails des résultats
+        function toggleDetails(id) {
+            const detailsRow = document.getElementById(`details-${id}`);
+            detailsRow.classList.toggle('show');
+        }
+
+        // Fermer le modal en cliquant en dehors
+        window.onclick = function(event) {
+            const modal = document.getElementById('loginModal');
+            if (event.target === modal) {
+                closeLoginModal();
+            }
+        }
+    </script>
+
+
+</body></html>

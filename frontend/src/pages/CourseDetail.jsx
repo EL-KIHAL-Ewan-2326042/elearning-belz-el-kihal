@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getCourseById } from '../api/courses';
-import { getQuizzesByCourse } from '../api/quizzes';
+import { getQuizzesByCourse, getMyResults } from '../api/quizzes';
+import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import VideoPlayer from '../components/VideoPlayer';
 
 export default function CourseDetail() {
+    const { user } = useAuth();
     const { id } = useParams();
     const [course, setCourse] = useState(null);
     const [quizzes, setQuizzes] = useState([]);
+    const [myResults, setMyResults] = useState([]);
     const [activeTab, setActiveTab] = useState('videos');
     const [selectedVideo, setSelectedVideo] = useState(null);
     const [selectedDocument, setSelectedDocument] = useState(null);
@@ -17,12 +20,23 @@ export default function CourseDetail() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [courseData, quizzesData] = await Promise.all([
+                const promises = [
                     getCourseById(id),
                     getQuizzesByCourse(id),
-                ]);
+                ];
+
+                if (user) {
+                    promises.push(getMyResults(user.id));
+                }
+
+                const results = await Promise.all(promises);
+                const courseData = results[0];
+                const quizzesData = results[1];
+                const myResultsData = user ? results[2] : [];
+
                 setCourse(courseData);
                 setQuizzes(quizzesData);
+                setMyResults(myResultsData);
 
                 if (courseData.videos?.length > 0) {
                     setSelectedVideo(courseData.videos[0]);
@@ -57,8 +71,9 @@ export default function CourseDetail() {
                 <Navbar />
                 <div className="text-center py-20">
                     <h1 className="text-2xl font-bold text-gray-600">Cours non trouvé</h1>
-                    <Link to="/courses" className="text-primary mt-4 inline-block">
-                        ← Retour aux cours
+                    <p className="text-gray-500 mt-2">Le cours demandé n'existe pas ou vous n'y avez pas accès.</p>
+                    <Link to="/courses" className="text-primary mt-4 inline-block btn btn-outline-primary">
+                        ← Retour à la liste des cours
                     </Link>
                 </div>
             </div>
@@ -123,9 +138,28 @@ export default function CourseDetail() {
                         {activeTab === 'videos' && selectedVideo && (
                             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
                                 <VideoPlayer video={selectedVideo} />
-                                <div className="p-6">
+                                <div className="p-6 border-b border-gray-100">
                                     <h2 className="text-xl font-bold mb-2">{selectedVideo.title}</h2>
                                     <p className="text-gray-600">{selectedVideo.description}</p>
+                                </div>
+                                <div className="p-6 bg-gray-50/50">
+                                    <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2">
+                                        📄 Transcription (IA)
+                                    </h3>
+                                    <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm max-h-60 overflow-y-auto custom-scrollbar">
+                                        {selectedVideo.transcription ? (
+                                            <p className="text-gray-700 whitespace-pre-line text-sm leading-relaxed">
+                                                {selectedVideo.transcription}
+                                            </p>
+                                        ) : (
+                                            <div className="text-center py-6 text-gray-400">
+                                                <p className="text-sm italic">Aucune transcription disponible.</p>
+                                                <p className="text-xs mt-1 opacity-70">
+                                                    (La génération automatique audio-vers-texte nécessite une clé API spécifique)
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -159,43 +193,71 @@ export default function CourseDetail() {
                             </div>
                         )}
 
-                        {activeTab === 'quizzes' && quizzes.length > 0 && (
+                        {activeTab === 'quizzes' && (
                             <div className="space-y-4">
-                                <div className="flex justify-end mb-4">
-                                    <Link
-                                        to={`/results?course=${course.id}`}
-                                        className="btn bg-blue-100 text-primary hover:bg-blue-200 transition no-underline px-4 py-2 rounded-lg font-medium"
-                                    >
-                                        📊 Voir mes résultats pour ce cours
-                                    </Link>
-                                </div>
-                                {quizzes.map(quiz => (
-                                    <div key={quiz.id} className="bg-white rounded-xl shadow-lg p-6">
-                                        <div className="flex items-start justify-between">
-                                            <div>
-                                                <h3 className="text-xl font-bold mb-2">{quiz.title}</h3>
-                                                <p className="text-gray-600 mb-4">{quiz.description}</p>
-                                                <span className="text-sm text-gray-500">
-                                                    {quiz.questions?.length || '?'} questions
-                                                    {quiz.isGeneratedByAI && ' • 🤖 Généré par IA'}
-                                                </span>
-                                            </div>
+                                {quizzes.length > 0 ? (
+                                    <>
+                                        <div className="flex justify-end mb-4">
                                             <Link
-                                                to={`/quiz/${quiz.id}`}
-                                                className="btn btn-primary no-underline"
+                                                to={`/results?course=${course.id}`}
+                                                className="btn bg-blue-100 text-primary hover:bg-blue-200 transition no-underline px-4 py-2 rounded-lg font-medium"
                                             >
-                                                Passer le QCM
+                                                📊 Voir tous mes résultats pour ce cours
                                             </Link>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                                        {quizzes.map(quiz => {
+                                            // Find attempts for this quiz
+                                            const quizAttempts = myResults.filter(r => r.quiz?.id === quiz.id || r.quiz === `/api/quizzes/${quiz.id}`);
+                                            const bestAttempt = quizAttempts.length > 0
+                                                ? quizAttempts.reduce((prev, current) => (prev.score / prev.maxScore > current.score / current.maxScore) ? prev : current)
+                                                : null;
 
-                        {activeTab === 'quizzes' && quizzes.length === 0 && (
-                            <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-                                <div className="text-5xl mb-4">📝</div>
-                                <p className="text-gray-500">Aucun QCM disponible pour ce cours</p>
+                                            return (
+                                                <div key={quiz.id} className="bg-white rounded-xl shadow-lg p-6">
+                                                    <div className="flex items-start justify-between">
+                                                        <div>
+                                                            <h3 className="text-xl font-bold mb-2">{quiz.title}</h3>
+                                                            <p className="text-gray-600 mb-4">{quiz.description}</p>
+                                                            <div className="flex gap-3 text-sm text-gray-500 items-center">
+                                                                <span>
+                                                                    {quiz.questions?.length || '?'} questions
+                                                                    {quiz.isGeneratedByAI && ' • 🤖 Généré par IA'}
+                                                                </span>
+
+                                                                {bestAttempt && (
+                                                                    <div className="flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1 rounded-full border border-green-200">
+                                                                        <span>🏆 Meilleur score: {bestAttempt.score}/{bestAttempt.maxScore}</span>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex flex-col gap-2">
+                                                            <Link
+                                                                to={`/quiz/${quiz.id}`}
+                                                                className="btn btn-primary no-underline text-center"
+                                                            >
+                                                                {bestAttempt ? 'Refaire le QCM' : 'Passer le QCM'}
+                                                            </Link>
+                                                            {bestAttempt && (
+                                                                <Link
+                                                                    to={`/results/${bestAttempt.id}`}
+                                                                    className="btn btn-outline-secondary text-sm py-1"
+                                                                >
+                                                                    Voir détails
+                                                                </Link>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </>
+                                ) : (
+                                    <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+                                        <div className="text-5xl mb-4">📝</div>
+                                        <p className="text-gray-500">Aucun QCM disponible pour ce cours</p>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

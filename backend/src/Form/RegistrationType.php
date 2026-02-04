@@ -39,14 +39,7 @@ class RegistrationType extends AbstractType
                     'placeholder' => 'Votre nom',
                 ],
             ])
-            ->add('specialty', TextType::class, [
-                'label' => 'Spécialité',
-                'required' => false,
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => 'Ex: Développement Web',
-                ],
-            ])
+
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'mapped' => false,

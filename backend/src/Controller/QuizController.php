@@ -17,7 +17,16 @@ class QuizController extends AbstractController
     #[Route('', name: 'quiz_index', methods: ['GET'])]
     public function index(QuizRepository $quizRepository): Response
     {
-        $quizzes = $quizRepository->findBy([], ['createdAt' => 'DESC']);
+        $user = $this->getUser();
+        
+        // Récupérer uniquement les QCM des cours du professeur connecté
+        $quizzes = $quizRepository->createQueryBuilder('q')
+            ->join('q.course', 'c')
+            ->where('c.teacher = :teacher')
+            ->setParameter('teacher', $user)
+            ->orderBy('q.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
         
         return $this->render('quiz/index.html.twig', [
             'quizzes' => $quizzes,

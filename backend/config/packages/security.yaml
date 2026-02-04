@@ -46,6 +46,8 @@ security:
         # Protected routes that need authentication
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/docs, roles: PUBLIC_ACCESS }
+        - { path: ^/api/students, methods: [POST], roles: PUBLIC_ACCESS }
+        - { path: ^/api/teachers, methods: [POST], roles: PUBLIC_ACCESS }
         - { path: ^/api/courses, methods: [GET], roles: PUBLIC_ACCESS }
         - { path: ^/api/quizzes, methods: [GET], roles: PUBLIC_ACCESS }
         - { path: ^/api$, methods: [GET], roles: PUBLIC_ACCESS }

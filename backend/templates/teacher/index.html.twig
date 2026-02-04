@@ -27,9 +27,7 @@
                             {{ teacher.firstName|slice(0, 1)|upper }}{{ teacher.lastName|slice(0, 1)|upper }}
                         </div>
                         <h5 class="card-title mb-1">{{ teacher.firstName }} {{ teacher.lastName }}</h5>
-                        {% if teacher.specialty %}
-                            <p class="text-primary small mb-2">{{ teacher.specialty }}</p>
-                        {% endif %}
+
                         <p class="text-muted small mb-0">{{ teacher.email }}</p>
                     </div>
                     <div class="card-footer bg-transparent text-center border-0">

@@ -50,13 +50,20 @@ export default function Home() {
 
                     <div className="flex gap-4 justify-center">
                         {!isAuthenticated && (
-                            <Link to="/login" className="btn btn-outline bg-white text-primary border-white hover:bg-opacity-90 no-underline">
-                                🔐 Connexion Étudiant
+                            <>
+                                <Link to="/register" className="btn bg-gray-200 text-gray-700 hover:bg-gray-300 border-0 no-underline">
+                                    S'enregistrer
+                                </Link>
+                                <Link to="/login" className="btn btn-outline bg-white text-primary border-white hover:bg-opacity-90 no-underline">
+                                    🔐 Connexion Étudiant
+                                </Link>
+                            </>
+                        )}
+                        {isAuthenticated && (
+                            <Link to="/courses" className="btn bg-white/20 text-white border-2 border-white/50 hover:bg-white/30 no-underline">
+                                📚 Mes Cours
                             </Link>
                         )}
-                        <Link to="/courses" className="btn bg-white/20 text-white border-2 border-white/50 hover:bg-white/30 no-underline">
-                            📚 {isAuthenticated ? 'Mes Cours' : 'Voir les Cours'}
-                        </Link>
                         {isAuthenticated && isStudent && (
                             <Link to="/results" className="btn bg-white/20 text-white border-2 border-white/50 hover:bg-white/30 no-underline">
                                 📊 Mes Résultats

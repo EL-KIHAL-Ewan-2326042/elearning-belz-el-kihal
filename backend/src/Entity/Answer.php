@@ -7,6 +7,7 @@ use App\Repository\AnswerRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: AnswerRepository::class)]
 #[ApiResource]
@@ -24,6 +25,7 @@ class Answer
 
     #[ORM\Column]
     #[Groups(['quiz:read'])]
+    #[SerializedName("isCorrect")]
     private bool $isCorrect = false;
 
     #[ORM\ManyToOne(inversedBy: 'answers')]
@@ -47,6 +49,13 @@ class Answer
     }
 
     public function isCorrect(): bool
+    {
+        return $this->isCorrect;
+    }
+
+    #[Groups(['quiz:read'])]
+    #[SerializedName("correct")]
+    public function getCorrect(): bool
     {
         return $this->isCorrect;
     }

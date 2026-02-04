@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f1d9280bba3dac5431b7502115daf6ad",
+    "content-hash": "e5d5b7c95a9ff9cab50a7fd6372aff0c",
     "packages": [
         {
             "name": "api-platform/doctrine-common",
@@ -1155,6 +1155,120 @@
                 "source": "https://github.com/api-platform/validator/tree/v4.2.14"
             },
             "time": "2026-01-16T13:22:15+00:00"
+        },
+        {
+            "name": "codewithkyrian/platform-package-installer",
+            "version": "1.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/CodeWithKyrian/platform-package-installer.git",
+                "reference": "5f1b64d1d38b0e3f57668d7994a26e7a03beb1e4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/CodeWithKyrian/platform-package-installer/zipball/5f1b64d1d38b0e3f57668d7994a26e7a03beb1e4",
+                "reference": "5f1b64d1d38b0e3f57668d7994a26e7a03beb1e4",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.1 || ^2.0",
+                "composer-runtime-api": "*",
+                "php": "^8.1",
+                "symfony/yaml": "^6.4 || ^7.2 || ^8.0"
+            },
+            "require-dev": {
+                "composer/composer": "~1.0 || ~2.0",
+                "pestphp/pest": "^2.36.0|^3.5.0",
+                "symfony/var-dumper": "^6.0|^7.0|^8.0"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Codewithkyrian\\PlatformPackageInstaller\\Plugin",
+                "plugin-modifies-downloads": true,
+                "plugin-modifies-install-path": true
+            },
+            "autoload": {
+                "psr-4": {
+                    "Codewithkyrian\\PlatformPackageInstaller\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kyrian Obikwelu",
+                    "email": "koshnawaza@gmail.com"
+                }
+            ],
+            "description": "A Composer plugin that provides fine-grained control over platform-specific package distribution for PHP projects",
+            "support": {
+                "issues": "https://github.com/CodeWithKyrian/platform-package-installer/issues",
+                "source": "https://github.com/CodeWithKyrian/platform-package-installer/tree/1.1.4"
+            },
+            "time": "2025-09-17T11:10:46+00:00"
+        },
+        {
+            "name": "codewithkyrian/whisper.php",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/CodeWithKyrian/whisper.php.git",
+                "reference": "84272cd6593586c2336b19a66d3f258d62bfc755"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/CodeWithKyrian/whisper.php/zipball/84272cd6593586c2336b19a66d3f258d62bfc755",
+                "reference": "84272cd6593586c2336b19a66d3f258d62bfc755",
+                "shasum": ""
+            },
+            "require": {
+                "codewithkyrian/platform-package-installer": "^1.0",
+                "ext-ffi": "*",
+                "php": "^8.1",
+                "psr/log": "^3.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.18",
+                "mockery/mockery": "^1.6",
+                "pestphp/pest": "^2.36.0|^3.5.0",
+                "symfony/var-dumper": "^6.4.11|^7.1.5"
+            },
+            "type": "platform-package",
+            "extra": {
+                "platform-urls": {
+                    "linux-arm64": "https://github.com/Codewithkyrian/whisper.php/releases/download/{version}/dist-linux-arm64.tar.gz",
+                    "darwin-arm64": "https://github.com/Codewithkyrian/whisper.php/releases/download/{version}/dist-darwin-arm64.tar.gz",
+                    "linux-x86_64": "https://github.com/Codewithkyrian/whisper.php/releases/download/{version}/dist-linux-x86_64.tar.gz",
+                    "darwin-x86_64": "https://github.com/Codewithkyrian/whisper.php/releases/download/{version}/dist-darwin-x86_64.tar.gz",
+                    "windows-x86_64": "https://github.com/Codewithkyrian/whisper.php/releases/download/{version}/dist-windows-x86_64.zip"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/Utils.php"
+                ],
+                "psr-4": {
+                    "Codewithkyrian\\Whisper\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kyrian Obikwelu",
+                    "email": "kyrianobikwelu@gmail.com"
+                }
+            ],
+            "description": "PHP bindings for OpenAI Whisper made possible by whisper.cpp",
+            "support": {
+                "issues": "https://github.com/CodeWithKyrian/whisper.php/issues",
+                "source": "https://github.com/CodeWithKyrian/whisper.php/tree/1.1.0"
+            },
+            "time": "2024-12-14T16:46:34+00:00"
         },
         {
             "name": "doctrine/collections",

@@ -15,11 +15,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: QuizAttemptRepository::class)]
 #[ApiResource(
     operations: [
-        new GetCollection(),
-        new \ApiPlatform\Metadata\Get(),
-        new Post(processor: \App\State\QuizAttemptProcessor::class),
+        new GetCollection(security: "is_granted('ROLE_USER')"),
+        new \ApiPlatform\Metadata\Get(security: "is_granted('ROLE_USER')"),
+        new Post(processor: \App\State\QuizAttemptProcessor::class, security: "is_granted('ROLE_USER')"),
     ],
-    normalizationContext: ['groups' => ['quiz_attempt:read']]
+    normalizationContext: ['groups' => ['quiz_attempt:read']],
+    order: ['submittedAt' => 'DESC']
 )]
 #[ApiFilter(SearchFilter::class, properties: ['student' => 'exact', 'quiz' => 'exact'])]
 class QuizAttempt

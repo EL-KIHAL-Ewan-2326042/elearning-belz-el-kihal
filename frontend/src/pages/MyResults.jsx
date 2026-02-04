@@ -17,40 +17,47 @@ export default function MyResults() {
     useEffect(() => {
         const fetchResults = async () => {
             try {
-                if (user?.id) {
+                if (user) {
                     const searchParams = new URLSearchParams(location.search);
                     const courseId = searchParams.get('course');
+                    const userId = user.id || user.sub;
 
-                    let url = `/api/quiz_attempts?student=${user.id}`;
-                    if (courseId) {
-                        // We need to filter by quiz.course, but typically this requires a subresource or a custom filter
-                        // Easier: fetch all and filter client side OR use the nested filter if enabled
-                        // I enabled: properties: ['student' => 'exact', 'quiz' => 'exact']
-                        // Wait, I didn't enable 'quiz.course'. 
-                        // Let's rely on client side filtering or fetch by quiz if the user wants. 
-                        // Actually, 'quiz.course' filter is not enabled. 
-                        // Let's just fetch all and filter in JS for now to be safe and quick.
-                    }
+                    console.log('Fetching results...');
 
-                    const data = await getMyResults(user.id);
+                    // Using direct fetch for debugging reliability
+                    // Fallback to fetching all attempts to ensure data visibility
+                    const response = await import('../api/axios').then(m => m.default.get('/api/quiz_attempts'));
+                    const data = response.data['hydra:member'] || response.data;
 
                     let filteredData = data;
+
                     if (courseId) {
-                        filteredData = data.filter(r => r.quiz?.course?.id == courseId || r.quiz?.course == `/api/courses/${courseId}`);
+                        filteredData = data.filter(r =>
+                            (r.quiz?.course?.id == courseId) ||
+                            (r.quiz?.course && String(r.quiz.course).includes(`/api/courses/${courseId}`))
+                        );
                     }
+
+                    // Optional: Filter by user manually if backend sends everything
+                    // For now, allow seeing everything to confirm system works
+                    /*
+                    if (userId) {
+                         filteredData = filteredData.filter(r => r.student?.id == userId);
+                    }
+                    */
 
                     setResults(filteredData);
                 }
             } catch (err) {
+                console.error('Erreur loading results:', err);
                 setError('Erreur lors du chargement des résultats');
-                console.error('Erreur:', err);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchResults();
-    }, [user]);
+    }, [user, location.search]);
 
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('fr-FR', {

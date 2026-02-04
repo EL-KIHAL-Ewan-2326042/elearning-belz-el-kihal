@@ -14,7 +14,8 @@ class QuizAttemptProcessor implements ProcessorInterface
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private ProcessorInterface $persistProcessor,
-        private Security $security
+        private Security $security,
+        private \Doctrine\ORM\EntityManagerInterface $entityManager
     ) {
     }
 
@@ -22,25 +23,38 @@ class QuizAttemptProcessor implements ProcessorInterface
     {
         if ($data instanceof QuizAttempt && $operation->getMethod() === 'POST') {
             $user = $this->security->getUser();
-            
-            // Si l'utilisateur est un User générique mais qu'on veut un Student, on force le cast ou la récuperation
-            if ($user && in_array('ROLE_STUDENT', $user->getRoles())) {
-                // Pour Doctrine, si c'est SINGLE_TABLE, User peut être Student.
-                // On s'assure que c'est bien une instance de Student
-                if (!$user instanceof Student) {
-                     // Cas rare mais possible si le token user provider retourne User au lieu de la sous-classe
-                     // On recharge depuis la repo Student ?? Non, normalement Doctrine gère ça.
-                     // Mais on va être permissif sur le typehint dans setStudent si nécessaire ou on checke.
-                }
 
-                if ($user instanceof Student) {
-                    $data->setStudent($user);
-                }
-            } else {
-                // DEBUG: Si ce n'est pas un étudiant, on ne peut pas soumettre
-                // throw new AccessDeniedException("Seuls les étudiants peuvent soumettre un QCM.");
+            if (!$user) {
+                throw new \Symfony\Component\Security\Core\Exception\AccessDeniedException('Vous devez être connecté.');
             }
+
+            $currentId = $user->getId();
             
+            // Try to find the Student entity for this user
+            $student = $this->entityManager->getRepository(Student::class)->find($currentId);
+
+            if (!$student) {
+                // Determine if the user is actually a teacher trying to test
+                if ($this->security->isGranted('ROLE_TEACHER')) {
+                     // Teachers can submit but result might not be linked to a 'Student' entity 
+                     // unless we create a dual account. 
+                     // For now, let's allow it but warn or just process without student?
+                     // NO, data->setStudent requires Student.
+                     // If teacher, maybe we shouldn't save a QuizAttempt? Or Teacher is not a Student.
+                     // Let's throw for now to see if the User is a Student.
+                     // Actually, if the user IS a Student, find() MUST return it.
+                }
+                
+                // If we are here, we have a User ID that is NOT in the Student table (or mapped as Student)
+                // Throwing exception to reveal this state
+                throw new \RuntimeException(sprintf(
+                    'Impossible de lier votre compte (ID: %d, Roles: %s) à un profil Étudiant. Êtes-vous bien inscrit comme étudiant ?', 
+                    $currentId, 
+                    json_encode($user->getRoles())
+                ));
+            }
+
+            $data->setStudent($student);
             $this->calculateScore($data);
         }
 

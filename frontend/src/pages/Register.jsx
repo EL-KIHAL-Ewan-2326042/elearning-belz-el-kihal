@@ -195,6 +195,12 @@ export default function Register() {
                             Se connecter
                         </Link>
                     </p>
+
+                    <div className="mt-4">
+                        <Link to="/" className="text-gray-400 text-sm hover:text-primary transition">
+                            ← Retour à l'accueil
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>

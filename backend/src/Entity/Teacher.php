@@ -14,10 +14,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource]
 class Teacher extends User
 {
-    #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['course:list', 'course:read'])]
-    private ?string $specialty = null;
-
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['course:read'])]
     private ?string $biography = null;
@@ -30,17 +26,6 @@ class Teacher extends User
     {
         $this->courses = new ArrayCollection();
         $this->setRoles(['ROLE_TEACHER']);
-    }
-
-    public function getSpecialty(): ?string
-    {
-        return $this->specialty;
-    }
-
-    public function setSpecialty(?string $specialty): static
-    {
-        $this->specialty = $specialty;
-        return $this;
     }
 
     public function getBiography(): ?string
