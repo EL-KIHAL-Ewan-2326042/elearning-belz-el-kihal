@@ -35,7 +35,7 @@ export default function Navbar() {
                                     onClick={handleLogout}
                                     className="btn btn-danger"
                                 >
-                                    🚪 Déconnexion
+                                    Se déconnecter
                                 </button>
                             </div>
                         </>
@@ -45,7 +45,7 @@ export default function Navbar() {
                                 S'enregistrer
                             </Link>
                             <Link to="/login" className="btn btn-primary no-underline">
-                                🔐 Connexion
+                                Se connecter
                             </Link>
                         </div>
                     )}

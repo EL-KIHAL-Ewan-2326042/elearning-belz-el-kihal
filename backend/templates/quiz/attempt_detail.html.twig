@@ -12,7 +12,7 @@
     </ol>
 </nav>
 
-<div class="card mb-4 border-0 shadow-sm hero-gradient text-white">
+<div class="card mb-4 border-0 shadow-sm text-dark">
     <div class="card-body p-4 text-center">
         <h2 class="h4 mb-2">{{ quiz.title }}</h2>
         <p class="mb-4 opacity-75">
@@ -20,11 +20,11 @@
         </p>
 
         <div class="d-inline-flex gap-4">
-            <div class="bg-white/20 backdrop-blur px-4 py-2 rounded">
+            <div class="bg-secondary-subtle px-4 py-2 rounded">
                 <small class="d-block opacity-75">Score</small>
                 <span class="fs-4 fw-bold">{{ attempt.score }} / {{ attempt.maxScore }}</span>
             </div>
-            <div class="bg-white/20 backdrop-blur px-4 py-2 rounded">
+            <div class="bg-secondary-subtle px-4 py-2 rounded">
                 <small class="d-block opacity-75">Pourcentage</small>
                 <span class="fs-4 fw-bold">{{ (attempt.score / attempt.maxScore * 100)|round(0) }}%</span>
             </div>

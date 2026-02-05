@@ -6,7 +6,7 @@ function LoginPage({ csrfToken, loginError, lastUsername }) {
 
     return (
         <div className="min-h-screen bg-light flex items-center justify-center p-5">
-            <div className="bg-white rounded-2xl w-full max-w-md p-10 shadow-xl animate-slideDown">
+            <div className="bg-white rounded-2xl w-full max-w-md p-10 shadow-xl">
                 <div className="text-center mb-8">
                     <Link to="/" className="logo-gradient no-underline text-3xl">
                         🎓 EduLearn
@@ -14,7 +14,7 @@ function LoginPage({ csrfToken, loginError, lastUsername }) {
                 </div>
 
                 <h1 className="text-3xl font-extrabold text-dark mb-2">
-                    {userType === 'student' ? 'Connexion Étudiant' : 'Connexion Professeur'}
+                    {userType === 'student' ? 'Se connecter en tant qu\'étudiant' : 'Se connecter en tant qu\'enseignant'}
                 </h1>
                 <p className="text-sm text-slate-500 mb-8">
                     {userType === 'student'

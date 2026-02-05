@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html lang="fr"><head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<html lang="fr">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduLearn - Maquette Interactive</title>
@@ -31,7 +33,7 @@
         /* NAVIGATION */
         nav {
             background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 20px 0;
             position: sticky;
             top: 0;
@@ -122,7 +124,7 @@
             border-radius: 16px;
             padding: 30px;
             margin-bottom: 40px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
         .carousel-header {
@@ -195,7 +197,7 @@
 
         .carousel-item:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
         }
 
         .carousel-item-video {
@@ -214,7 +216,7 @@
             position: absolute;
             width: 60px;
             height: 60px;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -301,7 +303,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -326,6 +328,7 @@
                 opacity: 0;
                 transform: translateY(-50px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -438,7 +441,7 @@
             background: white;
             border-radius: 16px;
             padding: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
         .results-header {
@@ -508,7 +511,7 @@
             background: white;
             border-radius: 16px;
             padding: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             margin-bottom: 40px;
         }
 
@@ -753,7 +756,9 @@
             }
         }
     </style>
-<meta name="dealabs-browser-extension" version="12.6.0"></head>
+    <meta name="dealabs-browser-extension" version="12.6.0">
+</head>
+
 <body>
     <!-- NAVIGATION -->
     <nav>
@@ -761,7 +766,7 @@
             <div class="logo">🎓 EduLearn</div>
             <div class="nav-buttons">
                 <button class="btn btn-primary" onclick="openLoginModal()">
-                    🔐 Connexion
+                    Se connecter
                 </button>
             </div>
         </div>
@@ -908,7 +913,8 @@
                     <div class="carousel-item-content">
                         <div class="carousel-item-title">Guide Symfony 7</div>
                         <div class="carousel-item-meta">👨‍🏫 Prof. Martin • 📄 25 pages</div>
-                        <button class="btn-generate-qcm" onclick="generateQCM('document', 1)" style="margin-bottom: 10px;">
+                        <button class="btn-generate-qcm" onclick="generateQCM('document', 1)"
+                            style="margin-bottom: 10px;">
                             🤖 Générer QCM (Prof)
                         </button>
                         <button class="btn-take-qcm" onclick="takeQCM('Guide Symfony 7')">
@@ -925,7 +931,8 @@
                     <div class="carousel-item-content">
                         <div class="carousel-item-title">Architecture MVC</div>
                         <div class="carousel-item-meta">👨‍🏫 Prof. Dubois • 📄 18 pages</div>
-                        <button class="btn-generate-qcm" onclick="generateQCM('document', 2)" style="margin-bottom: 10px;">
+                        <button class="btn-generate-qcm" onclick="generateQCM('document', 2)"
+                            style="margin-bottom: 10px;">
                             🤖 Générer QCM (Prof)
                         </button>
                         <button class="btn-take-qcm" onclick="takeQCM('Architecture MVC')">
@@ -942,7 +949,8 @@
                     <div class="carousel-item-content">
                         <div class="carousel-item-title">REST API Best Practices</div>
                         <div class="carousel-item-meta">👨‍🏫 Prof. Bernard • 📄 30 pages</div>
-                        <button class="btn-generate-qcm" onclick="generateQCM('document', 3)" style="margin-bottom: 10px;">
+                        <button class="btn-generate-qcm" onclick="generateQCM('document', 3)"
+                            style="margin-bottom: 10px;">
                             🤖 Générer QCM (Prof)
                         </button>
                         <button class="btn-take-qcm" onclick="takeQCM('REST API Best Practices')">
@@ -959,7 +967,8 @@
                     <div class="carousel-item-content">
                         <div class="carousel-item-title">Database Design</div>
                         <div class="carousel-item-meta">👨‍🏫 Prof. Laurent • 📄 22 pages</div>
-                        <button class="btn-generate-qcm" onclick="generateQCM('document', 4)" style="margin-bottom: 10px;">
+                        <button class="btn-generate-qcm" onclick="generateQCM('document', 4)"
+                            style="margin-bottom: 10px;">
                             🤖 Générer QCM (Prof)
                         </button>
                         <button class="btn-take-qcm" onclick="takeQCM('Database Design')">
@@ -976,7 +985,8 @@
                     <div class="carousel-item-content">
                         <div class="carousel-item-title">Frontend avec Twig</div>
                         <div class="carousel-item-meta">👨‍🏫 Prof. Sophie • 📄 15 pages</div>
-                        <button class="btn-generate-qcm" onclick="generateQCM('document', 5)" style="margin-bottom: 10px;">
+                        <button class="btn-generate-qcm" onclick="generateQCM('document', 5)"
+                            style="margin-bottom: 10px;">
                             🤖 Générer QCM (Prof)
                         </button>
                         <button class="btn-take-qcm" onclick="takeQCM('Frontend avec Twig')">
@@ -990,7 +1000,7 @@
         <!-- UPLOAD SECTION (PROFESSEUR) -->
         <div class="upload-section" id="uploadSection" style="display: none;">
             <h2 class="section-title">📤 Upload Vidéos &amp; Documents</h2>
-            
+
             <div class="upload-area" onclick="document.getElementById('fileInput').click()">
                 <div class="upload-icon">☁️</div>
                 <div class="upload-text">Glissez vos fichiers ici ou cliquez pour sélectionner</div>
@@ -1033,7 +1043,8 @@
                         <td>15/01/2026</td>
                         <td>18/20</td>
                         <td><span class="score-badge score-excellent">Excellent</span></td>
-                        <td><button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;" onclick="toggleDetails(1)">Voir détails</button></td>
+                        <td><button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;"
+                                onclick="toggleDetails(1)">Voir détails</button></td>
                     </tr>
                     <tr>
                         <td colspan="6" style="padding: 0;">
@@ -1089,7 +1100,8 @@
                         <td>14/01/2026</td>
                         <td>15/20</td>
                         <td><span class="score-badge score-good">Bien</span></td>
-                        <td><button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;" onclick="toggleDetails(2)">Voir détails</button></td>
+                        <td><button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;"
+                                onclick="toggleDetails(2)">Voir détails</button></td>
                     </tr>
                     <tr>
                         <td colspan="6" style="padding: 0;">
@@ -1145,7 +1157,8 @@
                         <td>13/01/2026</td>
                         <td>12/20</td>
                         <td><span class="score-badge score-average">Moyen</span></td>
-                        <td><button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;" onclick="toggleDetails(3)">Voir détails</button></td>
+                        <td><button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;"
+                                onclick="toggleDetails(3)">Voir détails</button></td>
                     </tr>
                     <tr>
                         <td colspan="6" style="padding: 0;">
@@ -1201,7 +1214,8 @@
                         <td>12/01/2026</td>
                         <td>9/20</td>
                         <td><span class="score-badge score-poor">À améliorer</span></td>
-                        <td><button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;" onclick="toggleDetails(4)">Voir détails</button></td>
+                        <td><button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;"
+                                onclick="toggleDetails(4)">Voir détails</button></td>
                     </tr>
                     <tr>
                         <td colspan="6" style="padding: 0;">
@@ -1257,7 +1271,8 @@
                         <td>11/01/2026</td>
                         <td>17/20</td>
                         <td><span class="score-badge score-excellent">Excellent</span></td>
-                        <td><button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;" onclick="toggleDetails(5)">Voir détails</button></td>
+                        <td><button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;"
+                                onclick="toggleDetails(5)">Voir détails</button></td>
                     </tr>
                     <tr>
                         <td colspan="6" style="padding: 0;">
@@ -1313,7 +1328,8 @@
                         <td>10/01/2026</td>
                         <td>14/20</td>
                         <td><span class="score-badge score-good">Bien</span></td>
-                        <td><button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;" onclick="toggleDetails(6)">Voir détails</button></td>
+                        <td><button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;"
+                                onclick="toggleDetails(6)">Voir détails</button></td>
                     </tr>
                     <tr>
                         <td colspan="6" style="padding: 0;">
@@ -1429,7 +1445,7 @@
             currentUserType = type;
             document.getElementById('tabStudent').classList.toggle('active', type === 'student');
             document.getElementById('tabTeacher').classList.toggle('active', type === 'teacher');
-            
+
             if (type === 'student') {
                 document.getElementById('modalTitle').textContent = 'Connexion Étudiant';
                 document.getElementById('modalSubtitle').textContent = 'Accédez à vos cours et QCM';
@@ -1441,10 +1457,10 @@
 
         function handleLogin(event) {
             event.preventDefault();
-            
+
             // Simulation de connexion
             alert(`Connexion réussie en tant que ${currentUserType === 'student' ? 'Étudiant' : 'Professeur'} !`);
-            
+
             // Si professeur, afficher la section upload
             if (currentUserType === 'teacher') {
                 document.getElementById('uploadSection').style.display = 'block';
@@ -1452,30 +1468,30 @@
                     document.getElementById('uploadSection').scrollIntoView({ behavior: 'smooth' });
                 }, 500);
             }
-            
+
             closeLoginModal();
         }
 
         // Génération de QCM
         function generateQCM(type, id) {
             const confirmMsg = `Voulez-vous générer un QCM automatique pour ce ${type === 'video' ? 'vidéo' : 'document'} ?`;
-            
+
             if (confirm(confirmMsg)) {
                 // Animation de chargement
                 const btn = event.target;
                 btn.innerHTML = '⏳ Génération...';
                 btn.disabled = true;
-                
+
                 setTimeout(() => {
                     btn.innerHTML = '✅ QCM Créé !';
                     btn.style.background = '#10b981';
-                    
+
                     setTimeout(() => {
                         btn.innerHTML = '🤖 Générer QCM (Prof)';
                         btn.disabled = false;
                         btn.style.background = '';
                     }, 2000);
-                    
+
                     alert('QCM généré avec succès ! 🎉\n\n• 10 questions créées\n• Difficulté progressive\n• Disponible pour les étudiants');
                 }, 2000);
             }
@@ -1484,15 +1500,15 @@
         // Passer le QCM (Étudiant)
         function takeQCM(courseName) {
             alert(`🎓 Démarrage du QCM : ${courseName}\n\n✓ 10 questions\n✓ Durée : 20 minutes\n✓ Note sur 20\n\nBonne chance ! 🍀`);
-            
+
             // Simulation du passage de QCM
             setTimeout(() => {
                 const score = Math.floor(Math.random() * 10) + 10; // Score entre 10 et 20
-                const message = score >= 16 ? '🌟 Excellent travail !' : 
-                               score >= 13 ? '👍 Bien joué !' : 
-                               score >= 10 ? '💪 Continuez vos efforts !' : 
-                               '📚 Révisez et réessayez !';
-                
+                const message = score >= 16 ? '🌟 Excellent travail !' :
+                    score >= 13 ? '👍 Bien joué !' :
+                        score >= 10 ? '💪 Continuez vos efforts !' :
+                            '📚 Révisez et réessayez !';
+
                 alert(`✅ QCM Terminé !\n\nVotre score : ${score}/20\n${message}`);
             }, 1000);
         }
@@ -1500,7 +1516,7 @@
         // Gestion des fichiers
         function handleFileSelect(event) {
             const files = Array.from(event.target.files);
-            
+
             files.forEach(file => {
                 const fileObj = {
                     id: Date.now() + Math.random(),
@@ -1508,7 +1524,7 @@
                     size: formatFileSize(file.size),
                     type: file.type.includes('video') ? '🎬' : '📄'
                 };
-                
+
                 uploadedFiles.push(fileObj);
                 addFileToList(fileObj);
             });
@@ -1516,7 +1532,7 @@
 
         function addFileToList(file) {
             const fileList = document.getElementById('fileList');
-            
+
             const fileItem = document.createElement('div');
             fileItem.className = 'file-item';
             fileItem.id = `file-${file.id}`;
@@ -1530,7 +1546,7 @@
                 </div>
                 <button class="btn-remove" onclick="removeFile(${file.id})">❌ Supprimer</button>
             `;
-            
+
             fileList.appendChild(fileItem);
         }
 
@@ -1550,18 +1566,18 @@
                 alert('Veuillez sélectionner au moins un fichier.');
                 return;
             }
-            
+
             // Simulation d'upload
             const btn = event.target;
             btn.innerHTML = '⏳ Upload en cours...';
             btn.disabled = true;
-            
+
             setTimeout(() => {
                 btn.innerHTML = '✅ Upload terminé !';
                 btn.style.background = '#10b981';
-                
+
                 alert(`${uploadedFiles.length} fichier(s) uploadé(s) avec succès ! 🎉`);
-                
+
                 setTimeout(() => {
                     uploadedFiles = [];
                     document.getElementById('fileList').innerHTML = '';
@@ -1584,7 +1600,7 @@
         }
 
         // Fermer le modal en cliquant en dehors
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             const modal = document.getElementById('loginModal');
             if (event.target === modal) {
                 closeLoginModal();
@@ -1593,4 +1609,6 @@
     </script>
 
 
-</body></html>
+</body>
+
+</html>

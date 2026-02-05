@@ -22,13 +22,13 @@ function Navbar() {
                                     type="submit"
                                     className="btn btn-danger"
                                 >
-                                    🚪 Déconnexion
+                                    Se déconnecter
                                 </button>
                             </form>
                         </>
                     ) : (
                         <Link to="/login" className="btn btn-primary no-underline">
-                            🔐 Connexion
+                            Se connecter
                         </Link>
                     )}
                 </div>

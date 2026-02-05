@@ -45,7 +45,7 @@ export default function Login() {
 
     return (
         <div className="min-h-screen hero-gradient flex items-center justify-center px-4">
-            <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md animate-slideDown">
+            <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
                 <div className="text-center mb-8">
                     <Link to="/" className="logo-gradient no-underline text-3xl">
                         🎓 EduLearn
