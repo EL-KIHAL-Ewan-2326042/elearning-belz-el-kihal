@@ -1,0 +1,308 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Analyse - {{ student.firstName }} {{ student.lastName }}{% endblock %}
+
+{% block body %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ path('teacher_students_list') }}">Suivi Étudiants</a></li>
+        <li class="breadcrumb-item active">{{ student.firstName }} {{ student.lastName }}</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">
+        <i class="bi bi-graph-up-arrow me-2"></i> Analyse des Performances
+    </h1>
+    <span class="badge bg-primary fs-6">{{ student.firstName }} {{ student.lastName }}</span>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-4" id="analyticsTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="global-tab" data-bs-toggle="tab" data-bs-target="#global" type="button" role="tab">
+            <i class="bi bi-globe me-1"></i> Analyse Globale
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="contextual-tab" data-bs-toggle="tab" data-bs-target="#contextual" type="button" role="tab">
+            <i class="bi bi-person-workspace me-1"></i> Mes Cours
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="analyticsTabsContent">
+    <!-- Global Analysis -->
+    <div class="tab-pane fade show active" id="global" role="tabpanel">
+        
+        <!-- KPIs -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-start border-4 border-primary">
+                    <div class="card-body">
+                        <div class="text-muted small text-uppercase fw-bold mb-1">Moyenne Générale</div>
+                        <div class="fs-2 fw-bold text-dark">{{ globalStats.avgScore|number_format(1) }} <span class="fs-6 text-muted">/ 20</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-start border-4 border-success">
+                    <div class="card-body">
+                        <div class="text-muted small text-uppercase fw-bold mb-1">Taux de Réussite</div>
+                        <div class="fs-2 fw-bold text-dark">
+                            {% if globalStats.totalAttempts > 0 %}
+                                {{ ((globalStats.successCount / globalStats.totalAttempts) * 100)|number_format(1) }}%
+                            {% else %}
+                                0%
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-start border-4 border-info">
+                    <div class="card-body">
+                        <div class="text-muted small text-uppercase fw-bold mb-1">QCM Passés</div>
+                        <div class="fs-2 fw-bold text-dark">{{ globalStats.totalAttempts }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="card h-100">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="card-title mb-0">Évolution des Résultats</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="evolutionChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="card-title mb-0">Répartition par Cours</h5>
+                    </div>
+                    <div class="card-body d-flex align-items-center justify-content-center">
+                        <canvas id="distributionChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="card-title mb-0">Profs Intervenants</h5>
+                    </div>
+                    <div class="card-body d-flex align-items-center justify-content-center">
+                        <canvas id="profDistributionChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contextual Analysis (My Courses) -->
+    <div class="tab-pane fade" id="contextual" role="tabpanel">
+        <div class="row g-4 mb-4">
+             <div class="col-md-4">
+                <div class="card h-100 border-start border-4 border-primary">
+                    <div class="card-body">
+                        <div class="text-muted small text-uppercase fw-bold mb-1">Moyenne (Mes Cours)</div>
+                        <div class="fs-2 fw-bold text-dark">{{ contextualStats.avgScore|number_format(1) }} <span class="fs-6 text-muted">/ 20</span></div>
+                    </div>
+                </div>
+            </div>
+        <!-- Contextual Charts -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+                <div class="card h-100">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="card-title mb-0">Évolution (Mes Cours)</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="contextualEvolutionChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card h-100">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="card-title mb-0">Répartition (Mes Cours)</h5>
+                    </div>
+                    <div class="card-body d-flex align-items-center justify-content-center">
+                        <canvas id="contextualDistributionChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-white py-3">
+                <h5 class="card-title mb-0">Détails par Cours</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Cours</th>
+                            <th class="text-center">Tentatives</th>
+                            <th class="text-center">Meilleure Note</th>
+                            <th class="text-end">Dernière Tentative</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for course in myCourses %}
+                            <tr>
+                                <td class="fw-medium">{{ course.title }}</td>
+                                <td class="text-center"><span class="badge bg-secondary">{{ course.attempts }}</span></td>
+                                <td class="text-center">
+                                    <span class="badge {% if course.maxScore >= 10 %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ course.maxScore|number_format(1) }} / 20
+                                    </span>
+                                </td>
+                                <td class="text-end">{{ course.lastAttempt|date('d/m/Y H:i') }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">Aucune activité sur vos cours.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- Global Charts ---
+
+        // Evolution Chart
+        const ctxEvolution = document.getElementById('evolutionChart').getContext('2d');
+        new Chart(ctxEvolution, {
+            type: 'line',
+            data: {
+                labels: {{ evolutionLabels|raw }},
+                datasets: [{
+                    label: 'Note Moyenne (/20)',
+                    data: {{ evolutionValues|raw }},
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 20
+                    }
+                }
+            }
+        });
+
+        // Distribution Chart
+        const ctxDist = document.getElementById('distributionChart').getContext('2d');
+        new Chart(ctxDist, {
+            type: 'doughnut',
+            data: {
+                labels: {{ courseLabels|raw }},
+                datasets: [{
+                    data: {{ courseValues|raw }},
+                    backgroundColor: [
+                        '#0d6efd', '#198754', '#ffc107', '#dc3545', '#6610f2', '#0dcaf0'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        // Professor Distribution Chart
+        const ctxProfDist = document.getElementById('profDistributionChart').getContext('2d');
+        new Chart(ctxProfDist, {
+            type: 'doughnut',
+            data: {
+                labels: {{ profLabels|raw }},
+                datasets: [{
+                    data: {{ profValues|raw }},
+                    backgroundColor: [
+                        '#6610f2', '#fd7e14', '#20c997', '#d63384', '#6f42c1', '#adb5bd'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        // --- Contextual Charts (Lazy Load) ---
+        
+        const contextualTabTrigger = document.getElementById('contextual-tab');
+        let contextualChartsInitialized = false;
+
+        contextualTabTrigger.addEventListener('shown.bs.tab', function (event) {
+            if (contextualChartsInitialized) return;
+            
+            // Contextual Evolution Chart
+            const ctxContextualEvolution = document.getElementById('contextualEvolutionChart').getContext('2d');
+            new Chart(ctxContextualEvolution, {
+                type: 'line',
+                data: {
+                    labels: {{ contextualEvolutionLabels|raw }},
+                    datasets: [{
+                        label: 'Note Moyenne (/20)',
+                        data: {{ contextualEvolutionValues|raw }},
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 20
+                        }
+                    }
+                }
+            });
+
+            // Contextual Distribution Chart
+            const ctxContextualDist = document.getElementById('contextualDistributionChart').getContext('2d');
+            new Chart(ctxContextualDist, {
+                type: 'doughnut',
+                data: {
+                    labels: {{ contextualCourseLabels|raw }},
+                    datasets: [{
+                        data: {{ contextualCourseValues|raw }},
+                        backgroundColor: [
+                            '#198754', '#ffc107', '#0dcaf0', '#dc3545', '#6610f2', '#0d6efd'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            contextualChartsInitialized = true;
+        });
+    });
+</script>
+{% endblock %}
