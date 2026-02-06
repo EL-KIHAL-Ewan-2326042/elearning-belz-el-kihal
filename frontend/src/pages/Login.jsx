@@ -20,13 +20,14 @@ export default function Login() {
             const user = await login(email, password);
             console.log('User logged in:', user);
 
-            // Redirect based on role - check for ROLE_TEACHER first
+            // Redirect based on role
             if (user.roles && user.roles.includes('ROLE_TEACHER')) {
-                console.log('Redirecting to teacher courses...');
-                // Use window.location for full page navigation to Symfony routes
+                console.log('Redirecting to teacher panel...');
+                // Pour les professeurs, redirection vers le panel Symfony (/courses)
                 window.location.href = '/courses';
             } else {
-                console.log('Redirecting to student courses...');
+                console.log('Redirecting to student panel...');
+                // Pour les étudiants, navigation React
                 navigate('/courses');
             }
         } catch (err) {
@@ -117,7 +118,7 @@ export default function Login() {
                         href="/teacher/login"
                         className="inline-block w-full py-3 border-2 border-primary text-primary font-semibold rounded-lg hover:bg-primary hover:text-white transition"
                     >
-                        👨‍🏫 Espace Professeur
+                        👨‍🏫 Espace Professeur (Classique)
                     </a>
 
                     <div>

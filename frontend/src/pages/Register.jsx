@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { register, login as apiLogin } from '../api/auth';
+import { register } from '../api/auth';
 import { useAuth } from '../context/AuthContext';
 
 export default function Register() {
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { loginWithToken, getRedirectUrl } = useAuth();
     const [formData, setFormData] = useState({
         email: '',
         plainPassword: '',
@@ -29,30 +29,32 @@ export default function Register() {
         setLoading(true);
 
         try {
-            // Choose endpoint based on user type
-            const endpoint = formData.userType === 'teacher' ? '/api/teachers' : '/api/students';
-            await register({
+            // Inscription avec retour JWT direct
+            const response = await register({
                 email: formData.email,
                 plainPassword: formData.plainPassword,
                 firstName: formData.firstName,
                 lastName: formData.lastName,
-                enrollmentDate: formData.userType === 'student' ? new Date().toISOString() : undefined
-            }, endpoint);
+            }, formData.userType);
 
-            // Auto-login after successful registration
-            try {
-                const user = await login(formData.email, formData.plainPassword);
+            // Connexion automatique avec le token reçu
+            const userData = {
+                id: response.user.id,
+                email: response.user.email,
+                firstName: response.user.firstName,
+                lastName: response.user.lastName,
+                roles: response.user.roles,
+            };
+            
+            loginWithToken(response.token, userData);
 
-                // Redirect based on role
-                if (user.roles && user.roles.includes('ROLE_TEACHER')) {
-                    window.location.href = '/courses';
-                } else {
-                    navigate('/courses');
-                }
-            } catch (loginErr) {
-                // If auto-login fails, redirect to login page with success message
-                console.warn('Auto-login failed, redirecting to login page', loginErr);
-                navigate('/login', { state: { message: 'Inscription réussie ! Connectez-vous.' } });
+            // Redirection selon le type d'utilisateur
+            if (formData.userType === 'teacher') {
+                // Redirection vers le panel professeur (/courses)
+                window.location.href = '/courses';
+            } else {
+                // Redirection vers le panel étudiant (React)
+                navigate('/courses');
             }
         } catch (err) {
             console.error(err);

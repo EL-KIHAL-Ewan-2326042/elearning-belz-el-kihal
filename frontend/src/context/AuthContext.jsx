@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { login as apiLogin } from '../api/auth';
+import { login as apiLogin, getCurrentUser } from '../api/auth';
 
 const AuthContext = createContext(null);
 
@@ -22,11 +22,15 @@ export function AuthProvider({ children }) {
         setLoading(false);
     }, []);
 
+    /**
+     * Connexion avec email/password
+     * Retourne les données utilisateur complètes
+     */
     const login = async (email, password) => {
         const data = await apiLogin(email, password);
         localStorage.setItem('token', data.token);
 
-        // Decode JWT to get user info (basic decode)
+        // Decode JWT to get user info
         const payload = JSON.parse(atob(data.token.split('.')[1]));
         const userData = {
             id: payload.id || payload.sub,
@@ -34,6 +38,26 @@ export function AuthProvider({ children }) {
             roles: payload.roles || [],
         };
 
+        // Récupérer les infos complètes de l'utilisateur
+        try {
+            const fullUserData = await getCurrentUser();
+            const completeUserData = { ...userData, ...fullUserData };
+            localStorage.setItem('user', JSON.stringify(completeUserData));
+            setUser(completeUserData);
+            return completeUserData;
+        } catch (e) {
+            // Fallback si /api/me échoue
+            localStorage.setItem('user', JSON.stringify(userData));
+            setUser(userData);
+            return userData;
+        }
+    };
+
+    /**
+     * Connexion directe avec token (après inscription)
+     */
+    const loginWithToken = (token, userData) => {
+        localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(userData));
         setUser(userData);
         return userData;
@@ -49,13 +73,28 @@ export function AuthProvider({ children }) {
     const isStudent = user?.roles?.includes('ROLE_STUDENT');
     const isTeacher = user?.roles?.includes('ROLE_TEACHER');
 
+    /**
+     * Détermine l'URL de redirection après connexion/inscription
+     */
+    const getRedirectUrl = (userData = user) => {
+        if (!userData) return '/login';
+        
+        const roles = userData.roles || [];
+        if (roles.includes('ROLE_TEACHER')) {
+            return '/courses'; // Panel professeur
+        }
+        return '/courses'; // Panel étudiant (même route mais affichage différent)
+    };
+
     const value = {
         user,
         login,
+        loginWithToken,
         logout,
         isAuthenticated,
         isStudent,
         isTeacher,
+        getRedirectUrl,
         loading,
     };
 

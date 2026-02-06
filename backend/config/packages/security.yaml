@@ -14,9 +14,12 @@ security:
         api:
             pattern: ^/api
             stateless: true
+            provider: app_user_provider
             entry_point: jwt
             json_login:
                 check_path: /api/login_check
+                username_path: username
+                password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
             jwt: ~
@@ -25,17 +28,10 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            lazy: true
             provider: app_user_provider
-            form_login:
-                login_path: app_teacher_login
-                check_path: app_teacher_login
-                enable_csrf: true
-                default_target_path: course_index
-                always_use_default_target_path: true
             logout:
-                path: app_teacher_logout
-                target: app_teacher_login
+                path: app_logout
+                target: app_login
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
@@ -43,16 +39,23 @@ security:
         # Allow CORS preflight requests
         - { path: ^/api,       roles: PUBLIC_ACCESS, methods: [OPTIONS] }
         
-        # Protected routes that need authentication
+        # Public routes
+        - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/login_check, roles: PUBLIC_ACCESS }
+        - { path: ^/api/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api/check-auth, roles: PUBLIC_ACCESS }
         - { path: ^/api/docs, roles: PUBLIC_ACCESS }
         - { path: ^/api/students, methods: [POST], roles: PUBLIC_ACCESS }
         - { path: ^/api/teachers, methods: [POST], roles: PUBLIC_ACCESS }
         - { path: ^/api/courses, methods: [GET], roles: PUBLIC_ACCESS }
         - { path: ^/api/quizzes, methods: [GET], roles: PUBLIC_ACCESS }
         - { path: ^/api$, methods: [GET], roles: PUBLIC_ACCESS }
+        
+        # Protected routes
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/courses, roles: ROLE_TEACHER }
+        - { path: ^/dashboard, roles: ROLE_STUDENT }
 
 when@test:
     security:

@@ -13,8 +13,23 @@ final class JWTCreatedListener
         $payload = $event->getData();
         $user = $event->getUser();
 
+        // Ajouter l'ID utilisateur
         if (method_exists($user, 'getId')) {
             $payload['id'] = $user->getId();
+        }
+
+        // Ajouter les informations de l'utilisateur dans le payload
+        if (method_exists($user, 'getFirstName')) {
+            $payload['firstName'] = $user->getFirstName();
+        }
+        
+        if (method_exists($user, 'getLastName')) {
+            $payload['lastName'] = $user->getLastName();
+        }
+
+        // S'assurer que les rôles sont présents
+        if (method_exists($user, 'getRoles')) {
+            $payload['roles'] = $user->getRoles();
         }
 
         $event->setData($payload);

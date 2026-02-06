@@ -5,24 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduLearn - Plateforme d'apprentissage</title>
     
-    {# In development, load from Vite dev server with proper React preamble #}
-    {% if app.environment == 'dev' %}
-        <script type="module">
-            import RefreshRuntime from 'http://localhost:3000/@react-refresh'
-            RefreshRuntime.injectIntoGlobalHook(window)
-            window.$RefreshReg$ = () => {}
-            window.$RefreshSig$ = () => (type) => type
-            window.__vite_plugin_react_preamble_installed__ = true
-        </script>
-        <script type="module" src="http://localhost:3000/@vite/client"></script>
-        <script type="module" src="http://localhost:3000/src/main.jsx"></script>
-    {% else %}
-        {# In production, load from built assets #}
-        <link rel="stylesheet" href="/build/assets/index.css">
-        <script type="module" src="/build/assets/index.js"></script>
-    {% endif %}
+    <link rel="stylesheet" href="/build/assets/index-6UInF6yt.css">
 </head>
 <body>
     <div id="root"></div>
+    
+    <script type="module" src="/build/assets/index-BnW7MlWJ.js"></script>
 </body>
 </html>

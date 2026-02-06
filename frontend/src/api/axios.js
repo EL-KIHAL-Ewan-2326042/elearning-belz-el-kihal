@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// URL de base de l'API - utilise la variable d'environnement ou une valeur par défaut
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
+    baseURL: API_URL,
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

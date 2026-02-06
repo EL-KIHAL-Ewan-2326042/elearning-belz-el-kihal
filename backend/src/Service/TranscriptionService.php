@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use Codewithkyrian\Whisper\Whisper;
 use Smalot\PdfParser\Parser;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -16,7 +15,7 @@ class TranscriptionService
     public function __construct(
         #[Autowire('%kernel.project_dir%')] string $projectDir,
         private HttpClientInterface $client,
-        #[Autowire('%env(default::GROQ_API_KEY)%')] private ?string $groqApiKey = null
+        #[Autowire('%env(default::MISTRAL_API_KEY)%')] private ?string $mistralApiKey = null
     ) {
         $this->projectDir = $projectDir;
     }
@@ -34,99 +33,89 @@ class TranscriptionService
 
     public function transcribe(string $inputPath, ?string $progressId = null): string
     {
-        $audioPath = $this->convertVideoToAudio($inputPath);
-        
+        if (empty($this->mistralApiKey)) {
+            throw new \RuntimeException('Clé API Mistral manquante pour la transcription.');
+        }
+
         try {
-            // 🚀 TURBO MODE: Use Groq API if key is present
-            if ($this->groqApiKey) {
-                try {
-                    if ($progressId && file_exists(sys_get_temp_dir() . '/transcription_' . $progressId . '.json')) {
-                        file_put_contents(sys_get_temp_dir() . '/transcription_' . $progressId . '.json', json_encode(['progress' => 50]));
-                    }
-
-                    $formFields = [
-                        'file' => DataPart::fromPath($audioPath),
-                        'model' => 'whisper-large-v3',
-                        'language' => 'fr',
-                        'response_format' => 'json'
-                    ];
-                    $formData = new FormDataPart($formFields);
-
-                    $response = $this->client->request('POST', 'https://api.groq.com/openai/v1/audio/transcriptions', [
-                        'headers' => [
-                            'Authorization' => 'Bearer ' . $this->groqApiKey,
-                            'Content-Type' => 'multipart/form-data',
-                        ] + $formData->getPreparedHeaders()->toArray(),
-                        'body' => $formData->bodyToIterable(),
-                    ]);
-
-                    if ($progressId && file_exists(sys_get_temp_dir() . '/transcription_' . $progressId . '.json')) {
-                        file_put_contents(sys_get_temp_dir() . '/transcription_' . $progressId . '.json', json_encode(['progress' => 100]));
-                    }
-
-                    $data = $response->toArray();
-                    return $data['text'] ?? '';
-                } catch (\Exception $e) {
-                    // Fallback to local if API fails
-                    file_put_contents($this->projectDir . '/api_error.log', "Groq Error: " . $e->getMessage() . "\n", FILE_APPEND);
-                }
+            // Mise à jour de la progression
+            if ($progressId && file_exists(sys_get_temp_dir() . '/transcription_' . $progressId . '.json')) {
+                file_put_contents(sys_get_temp_dir() . '/transcription_' . $progressId . '.json', json_encode(['progress' => 25]));
             }
 
-            // 🐢 LOCAL MODE (Fallback)
-            $params = null;
-            if ($progressId) {
-                $params = \Codewithkyrian\Whisper\WhisperFullParams::default()
-                    ->withLanguage('fr') // Force French to skip detection (saves time)
-                    ->withNThreads(8)    // Optimized for i5-12450H (8 Cores)
-                    ->withProgressCallback(function(int $progress) use ($progressId) {
-                        $file = sys_get_temp_dir() . '/transcription_' . $progressId . '.json';
-                        file_put_contents($file, json_encode(['progress' => $progress]));
-                    });
-            } else {
-                 // Even without progress ID, optimize params
-                 $params = \Codewithkyrian\Whisper\WhisperFullParams::default()
-                    ->withLanguage('fr')
-                    ->withNThreads(8);
+            // Renommer le fichier .mp4 en .m4a pour l'API Mistral
+            $filePath = $this->prepareFileForMistral($inputPath);
+
+            if ($progressId && file_exists(sys_get_temp_dir() . '/transcription_' . $progressId . '.json')) {
+                file_put_contents(sys_get_temp_dir() . '/transcription_' . $progressId . '.json', json_encode(['progress' => 50]));
             }
 
-            // "base" is better for French than "tiny", while still fast enough on i5.
-            $whisper = Whisper::fromPretrained('base', baseDir: $this->projectDir . '/var/whisper_models', params: $params);
-            $segments = $whisper->transcribe($audioPath);
-            
-            $text = '';
-            foreach ($segments as $segment) {
-                $text .= $segment->text;
+            // Appel à l'API Mistral pour la transcription
+            $formFields = [
+                'file' => DataPart::fromPath($filePath, 'audio.m4a', 'audio/m4a'),
+                'model' => 'mistral-ocr-latest',
+            ];
+            $formData = new FormDataPart($formFields);
+
+            $response = $this->client->request('POST', 'https://api.mistral.ai/v1/audio/transcriptions', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->mistralApiKey,
+                ] + $formData->getPreparedHeaders()->toArray(),
+                'body' => $formData->bodyToIterable(),
+            ]);
+
+            if ($progressId && file_exists(sys_get_temp_dir() . '/transcription_' . $progressId . '.json')) {
+                file_put_contents(sys_get_temp_dir() . '/transcription_' . $progressId . '.json', json_encode(['progress' => 100]));
             }
 
-            return trim($text);
-        } finally {
-            // Cleanup temporary audio file
-            if ($audioPath !== $inputPath && file_exists($audioPath)) {
-                // Windows fix: Force unset whisper to release file handle
-                unset($whisper);
-                // Windows fix: Suppress errors if file is locked
-                try {
-                    @unlink($audioPath);
-                } catch (\Throwable $e) {
-                    // Ignore cleanup error
-                }
+            $data = $response->toArray();
+            $text = $data['text'] ?? '';
+
+            // Nettoyage du fichier temporaire si différent de l'original
+            if ($filePath !== $inputPath && file_exists($filePath)) {
+                @unlink($filePath);
             }
+
+            return $text;
+        } catch (\Exception $e) {
+            // Nettoyage en cas d'erreur
+            if (isset($filePath) && $filePath !== $inputPath && file_exists($filePath)) {
+                @unlink($filePath);
+            }
+            throw $e;
         }
     }
 
-    private function convertVideoToAudio(string $filePath): string
+    /**
+     * Prépare le fichier pour l'API Mistral.
+     * Renomme les fichiers .mp4 en .m4a (même contenu, extension différente)
+     */
+    private function prepareFileForMistral(string $filePath): string
     {
         $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
         
-        // If already audio, return as is (or strict check for wav)
-        if (in_array($extension, ['wav', 'mp3', 'm4a'])) {
+        // Si c'est déjà un format supporté directement, retourner tel quel
+        if (in_array($extension, ['m4a', 'mp3', 'wav', 'ogg'])) {
             return $filePath;
         }
 
-        $outputPath = sys_get_temp_dir() . '/' . uniqid('audio_', true) . '.wav';
+        // Pour les fichiers .mp4, les renommer en .m4a
+        if ($extension === 'mp4') {
+            $tempPath = sys_get_temp_dir() . '/' . uniqid('audio_', true) . '.m4a';
+            
+            // Copier le fichier avec la nouvelle extension
+            if (!copy($filePath, $tempPath)) {
+                throw new \RuntimeException("Impossible de copier le fichier pour la préparation Mistral.");
+            }
+            
+            return $tempPath;
+        }
+
+        // Pour les autres formats vidéo, conversion nécessaire via ffmpeg
+        $tempPath = sys_get_temp_dir() . '/' . uniqid('audio_', true) . '.m4a';
         
-        // FFMpeg command to extract audio: 16kHz mono WAV is best for Whisper
-        $cmd = "ffmpeg -y -i \"$filePath\" -ar 16000 -ac 1 -c:a pcm_s16le \"$outputPath\" 2>&1";
+        // FFMpeg commande pour extraire l'audio au format m4a
+        $cmd = "ffmpeg -y -i \"$filePath\" -vn -c:a aac -b:a 128k \"$tempPath\" 2>&1";
         
         exec($cmd, $output, $returnCode);
         
@@ -134,6 +123,6 @@ class TranscriptionService
             throw new \RuntimeException("FFMpeg conversion failed: " . implode("\n", $output));
         }
 
-        return $outputPath;
+        return $tempPath;
     }
 }

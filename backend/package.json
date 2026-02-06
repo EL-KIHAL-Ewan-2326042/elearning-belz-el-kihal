@@ -25,6 +25,7 @@
         "build": "encore production --progress"
     },
     "dependencies": {
+        "lucide-react": "^0.563.0",
         "react-router-dom": "^7.13.0"
     }
 }

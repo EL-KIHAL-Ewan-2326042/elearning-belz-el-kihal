@@ -15,9 +15,10 @@ class ReactController extends AbstractController
     #[Route(
         path: '/{reactRouting}',
         name: 'react_app',
-        requirements: ['reactRouting' => '^(?!api|teacher|_profiler|_wdt|logout|debug).*'],
+        requirements: ['reactRouting' => '^(?!api|teacher|courses|login|logout|dashboard|_profiler|_wdt|debug).*'],
         defaults: ['reactRouting' => ''],
-        priority: -100
+        priority: -100,
+        methods: ['GET']
     )]
     public function index(): Response
     {
