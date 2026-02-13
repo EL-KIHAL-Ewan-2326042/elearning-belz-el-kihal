@@ -24,7 +24,7 @@ Attention ! Les QCM liés aux fixtures ne sont pas générés par Mistral et son
 Pour charger les données de test dans la base de données, exécutez la commande suivante dans le dossier `backend` :
 
 ```bash
-php bin/console doctrine:fixtures:load -n
+php bin/console doctrine:fixtures:load
 ```
 
 ## Vérifier le chargement
